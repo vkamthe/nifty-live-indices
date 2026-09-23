@@ -234,41 +234,6 @@
       to { transform: rotate(360deg); }
     }
 
-    /* Market Overview Ribbon */
-    .overview-ribbon {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 1rem;
-      margin-bottom: 2rem;
-    }
-
-    .ribbon-item {
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
-      border-radius: 12px;
-      padding: 1rem 1.25rem;
-      display: flex;
-      flex-direction: column;
-      gap: 0.3rem;
-    }
-
-    .ribbon-label {
-      font-size: 0.75rem;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: var(--text-muted);
-      font-weight: 600;
-    }
-
-    .ribbon-val {
-      font-size: 1.15rem;
-      font-weight: 700;
-      font-family: var(--font-mono);
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
     /* Indices Cards Grid */
     .indices-grid {
       display: grid;
@@ -640,7 +605,7 @@
         <div class="brand-logo">N</div>
         <div class="brand-info">
           <h1>NIFTY Live Indices <span class="tag">NSE India</span></h1>
-          <p>Real-Time Index Tracker via Method 2 Backend Proxy</p>
+          <p>NSE Tick: <span id="last-updated-val" style="font-family: var(--font-mono); color: var(--text-primary); font-weight: 600;">--</span> • Auto-refreshes every 1 min</p>
         </div>
       </div>
 
@@ -681,33 +646,6 @@
   <!-- Main Container -->
   <main class="container">
     
-    <!-- Top Summary Ribbon -->
-    <section class="overview-ribbon">
-      <div class="ribbon-item">
-        <span class="ribbon-label">Indices Tracked</span>
-        <span class="ribbon-val" id="total-indices-count">5 Indices</span>
-      </div>
-
-      <div class="ribbon-item">
-        <span class="ribbon-label">Market Breadth (Adv / Dec)</span>
-        <span class="ribbon-val" id="total-breadth-val">
-          <span style="color: var(--green);" id="total-advances">--</span>
-          <span style="color: var(--text-muted); font-size: 0.85rem;">vs</span>
-          <span style="color: var(--red);" id="total-declines">--</span>
-        </span>
-      </div>
-
-      <div class="ribbon-item">
-        <span class="ribbon-label">Top Gainer Today</span>
-        <span class="ribbon-val" style="color: var(--green);" id="top-performer-val">--</span>
-      </div>
-
-      <div class="ribbon-item">
-        <span class="ribbon-label">NSE Last Updated</span>
-        <span class="ribbon-val" style="font-size: 0.95rem;" id="last-updated-val">--</span>
-      </div>
-    </section>
-
     <!-- 5 Indices Cards Grid -->
     <section class="indices-grid" id="indices-container">
       <!-- Cards dynamically rendered here -->
@@ -819,9 +757,6 @@
       marketStatusText: document.getElementById('market-status-text'),
       proxySourceText: document.getElementById('proxy-source-text'),
       connectionDot: document.getElementById('connection-dot'),
-      totalAdvances: document.getElementById('total-advances'),
-      totalDeclines: document.getElementById('total-declines'),
-      topPerformerVal: document.getElementById('top-performer-val'),
       lastUpdatedVal: document.getElementById('last-updated-val'),
       settingsBtn: document.getElementById('settings-btn'),
       settingsModal: document.getElementById('settings-modal'),
@@ -952,10 +887,6 @@
         elements.lastUpdatedVal.textContent = timestamp;
       }
 
-      let totalAdv = 0;
-      let totalDec = 0;
-      let topPerformer = { name: '--', pct: -Infinity };
-
       // Map item by index name
       const itemMap = {};
       items.forEach(it => { itemMap[it.name] = it; });
@@ -973,12 +904,6 @@
         // Advances / Declines
         const adv = parseInt(item.advances || '0', 10);
         const dec = parseInt(item.declines || '0', 10);
-        totalAdv += adv;
-        totalDec += dec;
-
-        if (pct > topPerformer.pct) {
-          topPerformer = { name: target.label, pct: pct };
-        }
 
         // Intraday Low / High Position %
         const dayLow = Number(item.low);
@@ -1079,13 +1004,6 @@
       }).join('');
 
       elements.indicesContainer.innerHTML = cardsHtml;
-
-      // Update Ribbon Summary
-      elements.totalAdvances.textContent = `▲ ${totalAdv}`;
-      elements.totalDeclines.textContent = `▼ ${totalDec}`;
-      if (topPerformer.pct !== -Infinity) {
-        elements.topPerformerVal.textContent = `${topPerformer.name} (+${topPerformer.pct.toFixed(2)}%)`;
-      }
     }
 
     // Auto-Refresh Countdown Manager (updates every 1s)

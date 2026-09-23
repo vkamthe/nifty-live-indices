@@ -743,7 +743,8 @@
       isFetching: false,
       lastFetchTime: 0,
       previousData: {},
-      isPageVisible: true
+      isPageVisible: true,
+      isMarketOpen: false
     };
 
     // DOM Elements
@@ -793,14 +794,24 @@
       const isWeekday = day >= 1 && day <= 5;
       const isOpen = isWeekday && (currentMinutes >= openMinutes && currentMinutes < closeMinutes);
 
+      const wasOpen = state.isMarketOpen;
+      state.isMarketOpen = isOpen;
+
       if (isOpen) {
         elements.marketDot.className = 'dot live';
         elements.marketStatusText.textContent = 'NSE Market Live';
+        elements.timerPill.title = 'Auto-refreshing every 1 min while market is open';
+        // If market transitioned from closed to open, restart countdown
+        if (!wasOpen) {
+          resetCountdown();
+        }
       } else {
         elements.marketDot.className = 'dot paused';
         elements.marketStatusText.textContent = isWeekday && currentMinutes < openMinutes 
           ? 'Pre-Market (Opens 09:15 IST)' 
           : 'NSE Market Closed';
+        elements.countdownText.textContent = 'Market Closed';
+        elements.timerPill.title = 'Auto-refresh paused: NSE Market is closed';
       }
     }
 
@@ -1013,6 +1024,12 @@
       state.countdown = state.refreshInterval;
 
       state.timerId = setInterval(() => {
+        // If market is closed, do not auto-refresh
+        if (!state.isMarketOpen) {
+          elements.countdownText.textContent = 'Market Closed';
+          return;
+        }
+
         // If auto-refresh is disabled in settings
         if (state.refreshInterval <= 0) {
           elements.countdownText.textContent = 'Manual';
@@ -1033,7 +1050,11 @@
 
     function resetCountdown() {
       state.countdown = state.refreshInterval;
-      elements.countdownText.textContent = `${state.countdown}s`;
+      if (!state.isMarketOpen) {
+        elements.countdownText.textContent = 'Market Closed';
+      } else {
+        elements.countdownText.textContent = `${state.countdown}s`;
+      }
     }
 
     // Page Visibility API: Pause when tab is hidden, refresh immediately when tab is opened
@@ -1042,10 +1063,12 @@
 
       if (state.isPageVisible) {
         elements.timerPill.style.opacity = '1';
-        // If more than 60s passed while tab was away, trigger fresh fetch
-        const elapsed = (Date.now() - state.lastFetchTime) / 1000;
-        if (elapsed >= state.refreshInterval) {
-          fetchIndices();
+        // Only trigger fresh fetch on tab return if market is open
+        if (state.isMarketOpen) {
+          const elapsed = (Date.now() - state.lastFetchTime) / 1000;
+          if (elapsed >= state.refreshInterval) {
+            fetchIndices();
+          }
         }
       } else {
         elements.timerPill.style.opacity = '0.5';

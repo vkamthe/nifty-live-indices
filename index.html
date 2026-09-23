@@ -773,10 +773,20 @@
   </footer>
 
   <script>
-    // Configuration & State
+    // Auto-detect environment: if running on GitHub Pages / remote, default to data.json
+    const isLocalHost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    const defaultProxyUrl = isLocalHost ? 'http://localhost:3000/api/indices' : 'data.json';
+
+    let initialProxy = localStorage.getItem('nifty_proxy_url');
+    // Clear legacy localhost default if visiting from GitHub Pages to avoid browser Local Network permission prompt
+    if (!isLocalHost && initialProxy === 'http://localhost:3000/api/indices') {
+      initialProxy = 'data.json';
+      localStorage.setItem('nifty_proxy_url', 'data.json');
+    }
+
     const CONFIG = {
       defaultInterval: 60, // 1 minute
-      defaultProxy: 'http://localhost:3000/api/indices',
+      defaultProxy: defaultProxyUrl,
       staticFallback: 'data.json',
       targetIndices: [
         { key: 'NIFTY 50', category: 'Large Cap (50)', label: 'NIFTY 50' },
@@ -788,7 +798,7 @@
     };
 
     let state = {
-      proxyUrl: localStorage.getItem('nifty_proxy_url') || CONFIG.defaultProxy,
+      proxyUrl: initialProxy || CONFIG.defaultProxy,
       refreshInterval: parseInt(localStorage.getItem('nifty_refresh_sec') || '60', 10),
       countdown: 60,
       timerId: null,
@@ -883,10 +893,16 @@
         if (res.ok) {
           payload = await res.json();
           const latency = Math.round(performance.now() - startTime);
-          elements.proxySourceText.textContent = state.proxyUrl.includes('localhost') 
-            ? `Local Proxy (${latency}ms)` 
-            : `Live Proxy (${latency}ms)`;
-          elements.connectionDot.className = 'dot live';
+          if (state.proxyUrl === 'data.json') {
+            elements.proxySourceText.textContent = 'NSE Snapshot Feed';
+            elements.connectionDot.className = 'dot live';
+          } else if (state.proxyUrl.includes('localhost')) {
+            elements.proxySourceText.textContent = `Local Proxy (${latency}ms)`;
+            elements.connectionDot.className = 'dot live';
+          } else {
+            elements.proxySourceText.textContent = `Live Proxy (${latency}ms)`;
+            elements.connectionDot.className = 'dot live';
+          }
         } else {
           throw new Error(`Proxy status: ${res.status}`);
         }

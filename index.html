@@ -457,106 +457,6 @@
       height: 100%;
     }
 
-    /* Settings Modal */
-    .modal-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.7);
-      backdrop-filter: blur(8px);
-      z-index: 100;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 1.5rem;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.2s ease;
-    }
-
-    .modal-overlay.open {
-      opacity: 1;
-      pointer-events: auto;
-    }
-
-    .modal {
-      background: var(--bg-secondary);
-      border: 1px solid var(--border-color);
-      border-radius: 16px;
-      max-width: 540px;
-      width: 100%;
-      padding: 1.75rem;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
-      display: flex;
-      flex-direction: column;
-      gap: 1.25rem;
-    }
-
-    .modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .modal-header h3 {
-      font-size: 1.15rem;
-      font-weight: 700;
-    }
-
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      gap: 0.4rem;
-    }
-
-    .form-group label {
-      font-size: 0.8rem;
-      font-weight: 600;
-      color: var(--text-secondary);
-    }
-
-    .form-control {
-      background: rgba(0, 0, 0, 0.3);
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      padding: 0.6rem 0.85rem;
-      color: var(--text-primary);
-      font-family: var(--font-mono);
-      font-size: 0.85rem;
-      outline: none;
-      transition: border-color 0.15s ease;
-    }
-
-    .form-control:focus {
-      border-color: var(--blue);
-    }
-
-    .helper-text {
-      font-size: 0.72rem;
-      color: var(--text-muted);
-      line-height: 1.4;
-    }
-
-    .preset-btns {
-      display: flex;
-      gap: 0.5rem;
-      flex-wrap: wrap;
-    }
-
-    .preset-btn {
-      font-size: 0.72rem;
-      padding: 0.3rem 0.6rem;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid var(--border-color);
-      color: var(--text-secondary);
-      border-radius: 6px;
-      cursor: pointer;
-    }
-
-    .preset-btn:hover {
-      background: rgba(255, 255, 255, 0.1);
-      color: white;
-    }
-
     /* Footer */
     footer {
       margin-top: auto;
@@ -635,10 +535,6 @@
           <span>Refresh</span>
         </button>
 
-        <!-- Settings Button -->
-        <button class="btn btn-icon" id="settings-btn" title="Configure backend proxy & refresh rate">
-          ⚙️
-        </button>
       </div>
     </div>
   </header>
@@ -655,49 +551,6 @@
     </section>
 
   </main>
-
-  <!-- Settings Modal -->
-  <div class="modal-overlay" id="settings-modal">
-    <div class="modal">
-      <div class="modal-header">
-        <h3>Backend Proxy & Refresh Settings</h3>
-        <button class="btn btn-icon" id="close-modal-btn">✕</button>
-      </div>
-
-      <div class="form-group">
-        <label for="proxy-input">Backend Proxy API Endpoint</label>
-        <input type="text" id="proxy-input" class="form-control" placeholder="http://localhost:3000/api/indices">
-        <p class="helper-text">
-          GitHub Pages uses this backend proxy to fetch live NSE data without CORS / Akamai blocks.
-        </p>
-        
-        <div class="preset-btns">
-          <button class="preset-btn" data-preset="local">Local Node Server (localhost:3000)</button>
-          <button class="preset-btn" data-preset="static">Static data.json (Offline/Snapshot)</button>
-          <button class="preset-btn" data-preset="cloudflare">Cloudflare Worker (Custom)</button>
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label for="refresh-interval-select">Auto-Refresh Interval (while page is open)</label>
-        <select id="refresh-interval-select" class="form-control">
-          <option value="30">Every 30 seconds</option>
-          <option value="60" selected>Every 1 minute (Default)</option>
-          <option value="120">Every 2 minutes</option>
-          <option value="300">Every 5 minutes</option>
-          <option value="0">Disabled (Manual only)</option>
-        </select>
-        <p class="helper-text">
-          To save energy and bandwidth, refreshing automatically pauses when this browser tab is hidden and resumes when you switch back.
-        </p>
-      </div>
-
-      <div style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 0.5rem;">
-        <button class="btn" id="test-proxy-btn">Test Connection</button>
-        <button class="btn btn-primary" id="save-settings-btn">Save & Refresh</button>
-      </div>
-    </div>
-  </div>
 
   <!-- Footer -->
   <footer>
@@ -758,14 +611,7 @@
       marketStatusText: document.getElementById('market-status-text'),
       proxySourceText: document.getElementById('proxy-source-text'),
       connectionDot: document.getElementById('connection-dot'),
-      lastUpdatedVal: document.getElementById('last-updated-val'),
-      settingsBtn: document.getElementById('settings-btn'),
-      settingsModal: document.getElementById('settings-modal'),
-      closeModalBtn: document.getElementById('close-modal-btn'),
-      saveSettingsBtn: document.getElementById('save-settings-btn'),
-      testProxyBtn: document.getElementById('test-proxy-btn'),
-      proxyInput: document.getElementById('proxy-input'),
-      refreshIntervalSelect: document.getElementById('refresh-interval-select')
+      lastUpdatedVal: document.getElementById('last-updated-val')
     };
 
     // Indian Currency Number Formatter
@@ -879,11 +725,11 @@
         // If initial load failed completely
         elements.indicesContainer.innerHTML = `
           <div style="grid-column: 1 / -1; text-align: center; padding: 3rem; background: var(--bg-card); border-radius: 12px; border: 1px solid var(--border-color);">
-            <h3 style="color: var(--amber); margin-bottom: 0.5rem;">Could not connect to proxy</h3>
+            <h3 style="color: var(--amber); margin-bottom: 0.5rem;">Could not load market data</h3>
             <p style="color: var(--text-muted); font-size: 0.9rem; max-width: 500px; margin: 0 auto 1.5rem;">
-              Make sure your local Node proxy is running (<code>npm start</code>) or click Settings to configure a Cloudflare Worker / static snapshot.
+              Could not retrieve the index feed. Please check your network connection and try again.
             </p>
-            <button class="btn btn-primary" onclick="openSettings()">Open Settings</button>
+            <button class="btn btn-primary" onclick="fetchIndices(true)">Retry Now</button>
           </div>
         `;
       }
@@ -1077,69 +923,6 @@
 
     // Event Listeners
     elements.refreshBtn.addEventListener('click', () => {
-      fetchIndices(true);
-    });
-
-    // Settings Modal Open/Close
-    function openSettings() {
-      elements.proxyInput.value = state.proxyUrl;
-      elements.refreshIntervalSelect.value = state.refreshInterval;
-      elements.settingsModal.classList.add('open');
-    }
-
-    function closeSettings() {
-      elements.settingsModal.classList.remove('open');
-    }
-
-    elements.settingsBtn.addEventListener('click', openSettings);
-    elements.closeModalBtn.addEventListener('click', closeSettings);
-    elements.settingsModal.addEventListener('click', (e) => {
-      if (e.target === elements.settingsModal) closeSettings();
-    });
-
-    // Presets in modal
-    document.querySelectorAll('.preset-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const preset = btn.getAttribute('data-preset');
-        if (preset === 'local') {
-          elements.proxyInput.value = 'http://localhost:3000/api/indices';
-        } else if (preset === 'static') {
-          elements.proxyInput.value = 'data.json';
-        } else if (preset === 'cloudflare') {
-          elements.proxyInput.value = 'https://nifty-indices-proxy.YOUR_SUBDOMAIN.workers.dev/api/indices';
-        }
-      });
-    });
-
-    // Test proxy connection
-    elements.testProxyBtn.addEventListener('click', async () => {
-      const url = elements.proxyInput.value.trim();
-      elements.testProxyBtn.textContent = 'Testing...';
-      try {
-        const res = await fetch(url);
-        if (res.ok) {
-          alert('✅ Connection Successful! Proxy responded with status 200.');
-        } else {
-          alert(`⚠️ Server responded with status ${res.status}`);
-        }
-      } catch (err) {
-        alert(`❌ Connection Failed: ${err.message}`);
-      }
-      elements.testProxyBtn.textContent = 'Test Connection';
-    });
-
-    // Save Settings
-    elements.saveSettingsBtn.addEventListener('click', () => {
-      const newProxy = elements.proxyInput.value.trim() || CONFIG.defaultProxy;
-      const newInterval = parseInt(elements.refreshIntervalSelect.value, 10);
-
-      state.proxyUrl = newProxy;
-      state.refreshInterval = newInterval;
-
-      localStorage.setItem('nifty_proxy_url', newProxy);
-      localStorage.setItem('nifty_refresh_sec', newInterval.toString());
-
-      closeSettings();
       fetchIndices(true);
     });
 

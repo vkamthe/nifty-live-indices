@@ -1,10 +1,7 @@
 name: Update NSE Indices Data
 
 on:
-  schedule:
-    # Runs during NSE trading days Mon-Fri every hour between 03:45 UTC (09:15 IST) and 10:15 UTC (15:45 IST)
-    - cron: "45 3-10 * * 1-5"
-  workflow_dispatch: {}
+  workflow_dispatch: {} # Manual trigger only — no automated background cron
 
 permissions:
   contents: write

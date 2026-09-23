@@ -457,6 +457,228 @@
       height: 100%;
     }
 
+    /* Light Mode Theme */
+    body.light-mode {
+      --bg-primary: #f8fafc;
+      --bg-secondary: #ffffff;
+      --bg-card: rgba(255, 255, 255, 0.92);
+      --bg-card-hover: #ffffff;
+      --border-color: rgba(0, 0, 0, 0.09);
+      --border-highlight: rgba(37, 99, 235, 0.35);
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --text-muted: #64748b;
+      --green: #059669;
+      --green-glow: rgba(5, 150, 105, 0.15);
+      --green-bg: rgba(5, 150, 105, 0.1);
+      --red: #dc2626;
+      --red-glow: rgba(220, 38, 38, 0.15);
+      --red-bg: rgba(220, 38, 38, 0.1);
+      background-image: 
+        radial-gradient(circle at 15% 15%, rgba(59, 130, 246, 0.05) 0%, transparent 40%),
+        radial-gradient(circle at 85% 85%, rgba(16, 185, 129, 0.04) 0%, transparent 40%);
+    }
+
+    body.light-mode header {
+      background: rgba(255, 255, 255, 0.88);
+      border-bottom-color: rgba(0, 0, 0, 0.08);
+    }
+
+    body.light-mode footer {
+      background: rgba(248, 250, 252, 0.95);
+      border-top-color: rgba(0, 0, 0, 0.08);
+    }
+
+    body.light-mode .index-card {
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+    }
+
+    body.light-mode .index-card:hover {
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.09);
+    }
+
+    body.light-mode .metrics-grid {
+      background: rgba(0, 0, 0, 0.03);
+      border-color: rgba(0, 0, 0, 0.05);
+    }
+
+    body.light-mode .status-badge {
+      background: rgba(0, 0, 0, 0.04);
+      border-color: rgba(0, 0, 0, 0.08);
+      color: var(--text-secondary);
+    }
+
+    body.light-mode .btn {
+      background: #ffffff;
+      border-color: rgba(0, 0, 0, 0.12);
+      color: var(--text-primary);
+    }
+
+    body.light-mode .btn:hover {
+      background: #f1f5f9;
+      border-color: rgba(0, 0, 0, 0.2);
+    }
+
+    body.light-mode .btn-primary {
+      background: #2563eb;
+      border-color: #1d4ed8;
+      color: white;
+    }
+
+    body.light-mode .range-bar-track {
+      background: rgba(0, 0, 0, 0.08);
+    }
+
+    body.light-mode .timer-pill {
+      background: rgba(59, 130, 246, 0.12);
+      border-color: rgba(59, 130, 246, 0.3);
+      color: #1d4ed8;
+    }
+
+    body.light-mode .category-pill {
+      background: rgba(0, 0, 0, 0.04);
+      border-color: rgba(0, 0, 0, 0.08);
+      color: var(--text-secondary);
+    }
+
+    body.light-mode .modal {
+      background: #ffffff;
+      border-color: rgba(0, 0, 0, 0.12);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    }
+
+    body.light-mode .form-control {
+      background: #f8fafc;
+      border-color: rgba(0, 0, 0, 0.15);
+      color: #0f172a;
+    }
+
+    body.light-mode .theme-btn {
+      background: #f8fafc;
+      border-color: rgba(0, 0, 0, 0.1);
+      color: #475569;
+    }
+
+    body.light-mode .theme-btn.active {
+      background: rgba(59, 130, 246, 0.12);
+      border-color: #2563eb;
+      color: #1d4ed8;
+    }
+
+    /* Preferences Modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.65);
+      backdrop-filter: blur(8px);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+
+    .modal-overlay.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      max-width: 480px;
+      width: 100%;
+      padding: 1.75rem;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-header h3 {
+      font-size: 1.15rem;
+      font-weight: 700;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .form-group label {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    .form-control {
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 0.65rem 0.85rem;
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      font-size: 0.85rem;
+      outline: none;
+      transition: border-color 0.15s ease;
+    }
+
+    .form-control:focus {
+      border-color: var(--blue);
+    }
+
+    .helper-text {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    /* Theme Option Buttons */
+    .theme-options {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+    }
+
+    .theme-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.65rem 1rem;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-color);
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      font-family: var(--font-sans);
+    }
+
+    .theme-btn:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-primary);
+    }
+
+    .theme-btn.active {
+      background: rgba(59, 130, 246, 0.15);
+      border-color: var(--blue);
+      color: #60a5fa;
+    }
+
     /* Footer */
     footer {
       margin-top: auto;
@@ -535,6 +757,15 @@
           <span>Refresh</span>
         </button>
 
+        <!-- Quick Theme Toggle -->
+        <button class="btn btn-icon" id="theme-toggle-btn" title="Toggle Light / Dark Mode">
+          <span id="theme-toggle-icon">☀️</span>
+        </button>
+
+        <!-- Preferences / Settings Button -->
+        <button class="btn btn-icon" id="settings-btn" title="Dashboard Preferences">
+          ⚙️
+        </button>
       </div>
     </div>
   </header>
@@ -551,6 +782,49 @@
     </section>
 
   </main>
+
+  <!-- Preferences Modal -->
+  <div class="modal-overlay" id="settings-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Dashboard Preferences</h3>
+        <button class="btn btn-icon" id="close-modal-btn">✕</button>
+      </div>
+
+      <!-- Theme Setting -->
+      <div class="form-group">
+        <label>Appearance / Theme</label>
+        <div class="theme-options">
+          <button class="theme-btn active" id="theme-btn-dark">
+            <span>🌙</span> Dark Mode
+          </button>
+          <button class="theme-btn" id="theme-btn-light">
+            <span>☀️</span> Light Mode
+          </button>
+        </div>
+      </div>
+
+      <!-- Refresh Rate Setting -->
+      <div class="form-group">
+        <label for="refresh-interval-select">Auto-Refresh Interval (During Market Hours)</label>
+        <select id="refresh-interval-select" class="form-control">
+          <option value="30">Every 30 seconds</option>
+          <option value="60" selected>Every 1 minute (Default)</option>
+          <option value="120">Every 2 minutes</option>
+          <option value="180">Every 3 minutes</option>
+          <option value="300">Every 5 minutes</option>
+          <option value="0">Manual Only (Disable auto-refresh)</option>
+        </select>
+        <p class="helper-text">
+          Auto-refresh runs while the market is open (09:15–15:30 IST) and automatically pauses when the market is closed or when this browser tab is hidden.
+        </p>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 0.5rem;">
+        <button class="btn btn-primary" id="save-settings-btn">Done</button>
+      </div>
+    </div>
+  </div>
 
   <!-- Footer -->
   <footer>
@@ -597,7 +871,8 @@
       lastFetchTime: 0,
       previousData: {},
       isPageVisible: true,
-      isMarketOpen: false
+      isMarketOpen: false,
+      theme: localStorage.getItem('nifty_theme') || 'dark'
     };
 
     // DOM Elements
@@ -611,7 +886,16 @@
       marketStatusText: document.getElementById('market-status-text'),
       proxySourceText: document.getElementById('proxy-source-text'),
       connectionDot: document.getElementById('connection-dot'),
-      lastUpdatedVal: document.getElementById('last-updated-val')
+      lastUpdatedVal: document.getElementById('last-updated-val'),
+      themeToggleBtn: document.getElementById('theme-toggle-btn'),
+      themeToggleIcon: document.getElementById('theme-toggle-icon'),
+      settingsBtn: document.getElementById('settings-btn'),
+      settingsModal: document.getElementById('settings-modal'),
+      closeModalBtn: document.getElementById('close-modal-btn'),
+      saveSettingsBtn: document.getElementById('save-settings-btn'),
+      themeBtnDark: document.getElementById('theme-btn-dark'),
+      themeBtnLight: document.getElementById('theme-btn-light'),
+      refreshIntervalSelect: document.getElementById('refresh-interval-select')
     };
 
     // Indian Currency Number Formatter
@@ -921,13 +1205,72 @@
       }
     });
 
+    // Theme Management (Dark Mode vs Light Mode)
+    function setTheme(theme) {
+      state.theme = theme;
+      localStorage.setItem('nifty_theme', theme);
+      if (theme === 'light') {
+        document.body.classList.add('light-mode');
+        if (elements.themeToggleIcon) elements.themeToggleIcon.textContent = '🌙';
+        if (elements.themeToggleBtn) elements.themeToggleBtn.title = 'Switch to Dark Mode';
+        if (elements.themeBtnLight) elements.themeBtnLight.classList.add('active');
+        if (elements.themeBtnDark) elements.themeBtnDark.classList.remove('active');
+      } else {
+        document.body.classList.remove('light-mode');
+        if (elements.themeToggleIcon) elements.themeToggleIcon.textContent = '☀️';
+        if (elements.themeToggleBtn) elements.themeToggleBtn.title = 'Switch to Light Mode';
+        if (elements.themeBtnDark) elements.themeBtnDark.classList.add('active');
+        if (elements.themeBtnLight) elements.themeBtnLight.classList.remove('active');
+      }
+    }
+
+    function toggleTheme() {
+      setTheme(state.theme === 'dark' ? 'light' : 'dark');
+    }
+
+    // Preferences Modal Open/Close
+    function openSettings() {
+      elements.refreshIntervalSelect.value = state.refreshInterval;
+      if (state.theme === 'light') {
+        elements.themeBtnLight.classList.add('active');
+        elements.themeBtnDark.classList.remove('active');
+      } else {
+        elements.themeBtnDark.classList.add('active');
+        elements.themeBtnLight.classList.remove('active');
+      }
+      elements.settingsModal.classList.add('open');
+    }
+
+    function closeSettings() {
+      elements.settingsModal.classList.remove('open');
+    }
+
     // Event Listeners
     elements.refreshBtn.addEventListener('click', () => {
       fetchIndices(true);
     });
 
+    elements.themeToggleBtn.addEventListener('click', toggleTheme);
+    elements.settingsBtn.addEventListener('click', openSettings);
+    elements.closeModalBtn.addEventListener('click', closeSettings);
+    elements.settingsModal.addEventListener('click', (e) => {
+      if (e.target === elements.settingsModal) closeSettings();
+    });
+
+    elements.themeBtnDark.addEventListener('click', () => setTheme('dark'));
+    elements.themeBtnLight.addEventListener('click', () => setTheme('light'));
+
+    elements.saveSettingsBtn.addEventListener('click', () => {
+      const newInterval = parseInt(elements.refreshIntervalSelect.value, 10);
+      state.refreshInterval = newInterval;
+      localStorage.setItem('nifty_refresh_sec', newInterval.toString());
+      resetCountdown();
+      closeSettings();
+    });
+
     // Initialization
     function init() {
+      setTheme(state.theme);
       checkMarketStatus();
       setInterval(checkMarketStatus, 30000); // Check market open/close every 30s
       startCountdown();

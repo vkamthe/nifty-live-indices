@@ -1,0 +1,1200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NIFTY Live Indices Tracker — NSE India</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📈</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-primary: #0a0e17;
+      --bg-secondary: #111827;
+      --bg-card: rgba(17, 24, 39, 0.75);
+      --bg-card-hover: rgba(24, 34, 53, 0.85);
+      --border-color: rgba(255, 255, 255, 0.08);
+      --border-highlight: rgba(59, 130, 246, 0.3);
+      --text-primary: #f3f4f6;
+      --text-secondary: #9ca3af;
+      --text-muted: #6b7280;
+      
+      --green: #10b981;
+      --green-glow: rgba(16, 185, 129, 0.2);
+      --green-bg: rgba(16, 185, 129, 0.12);
+      --red: #ef4444;
+      --red-glow: rgba(239, 68, 68, 0.2);
+      --red-bg: rgba(239, 68, 68, 0.12);
+      --blue: #3b82f6;
+      --amber: #f59e0b;
+      
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      line-height: 1.5;
+      background-image: 
+        radial-gradient(circle at 15% 15%, rgba(59, 130, 246, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 85% 85%, rgba(16, 185, 129, 0.06) 0%, transparent 40%);
+      background-attachment: fixed;
+    }
+
+    .container {
+      max-width: 1320px;
+      margin: 0 auto;
+      padding: 1.5rem 1.25rem 3rem;
+      width: 100%;
+    }
+
+    /* Header */
+    header {
+      background: rgba(10, 14, 23, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-color);
+      position: sticky;
+      top: 0;
+      z-index: 40;
+    }
+
+    .header-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 1.25rem;
+      max-width: 1320px;
+      margin: 0 auto;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .brand-logo {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, #2563eb, #10b981);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 1.15rem;
+      color: white;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
+    }
+
+    .brand-info h1 {
+      font-size: 1.25rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .brand-info .tag {
+      font-size: 0.65rem;
+      background: rgba(59, 130, 246, 0.15);
+      color: #60a5fa;
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      padding: 0.15rem 0.45rem;
+      border-radius: 4px;
+      text-transform: uppercase;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+    }
+
+    .brand-info p {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    /* Market status & Countdown badges */
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.35rem 0.75rem;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-color);
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--text-muted);
+    }
+
+    .dot.live {
+      background: var(--green);
+      box-shadow: 0 0 8px var(--green);
+      animation: pulse 2s infinite;
+    }
+
+    .dot.paused {
+      background: var(--amber);
+      box-shadow: 0 0 8px var(--amber);
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.85); }
+    }
+
+    .timer-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: rgba(59, 130, 246, 0.1);
+      border: 1px solid rgba(59, 130, 246, 0.25);
+      color: #93c5fd;
+      padding: 0.35rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-family: var(--font-mono);
+      font-weight: 600;
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.45rem;
+      padding: 0.45rem 0.9rem;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      font-family: var(--font-sans);
+    }
+
+    .btn:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .btn-primary {
+      background: #2563eb;
+      border-color: #3b82f6;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #1d4ed8;
+    }
+
+    .btn-icon {
+      padding: 0.45rem;
+      width: 34px;
+      height: 34px;
+    }
+
+    .spin {
+      animation: rotate 1s linear infinite;
+    }
+
+    @keyframes rotate {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    /* Market Overview Ribbon */
+    .overview-ribbon {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .ribbon-item {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1rem 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+
+    .ribbon-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .ribbon-val {
+      font-size: 1.15rem;
+      font-weight: 700;
+      font-family: var(--font-mono);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    /* Indices Cards Grid */
+    .indices-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .index-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 1.5rem;
+      backdrop-filter: blur(10px);
+      transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .index-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--border-highlight);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+    }
+
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 0.75rem;
+    }
+
+    .card-title-group h2 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      color: var(--text-primary);
+    }
+
+    .card-title-group .symbol-subtitle {
+      font-size: 0.75rem;
+      font-family: var(--font-mono);
+      color: var(--text-muted);
+    }
+
+    .category-pill {
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 0.2rem 0.55rem;
+      border-radius: 6px;
+      text-transform: uppercase;
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-color);
+    }
+
+    /* Price Section */
+    .price-section {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .ltp {
+      font-family: var(--font-mono);
+      font-size: 1.95rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      transition: color 0.4s ease;
+    }
+
+    .price-flash-green {
+      animation: flashGreen 1.2s ease-out;
+    }
+
+    .price-flash-red {
+      animation: flashRed 1.2s ease-out;
+    }
+
+    @keyframes flashGreen {
+      0% { color: #34d399; text-shadow: 0 0 15px rgba(52, 211, 153, 0.6); }
+      100% { color: inherit; text-shadow: none; }
+    }
+
+    @keyframes flashRed {
+      0% { color: #f87171; text-shadow: 0 0 15px rgba(248, 113, 113, 0.6); }
+      100% { color: inherit; text-shadow: none; }
+    }
+
+    .change-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.35rem 0.7rem;
+      border-radius: 8px;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
+
+    .change-badge.positive {
+      background: var(--green-bg);
+      color: var(--green);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .change-badge.negative {
+      background: var(--red-bg);
+      color: var(--red);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
+    /* Range slider bar */
+    .range-box {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .range-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+    }
+
+    .range-bar-track {
+      height: 6px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 4px;
+      position: relative;
+      overflow: visible;
+    }
+
+    .range-bar-fill {
+      position: absolute;
+      height: 100%;
+      background: linear-gradient(90deg, #3b82f6, #10b981);
+      border-radius: 4px;
+    }
+
+    .range-bar-marker {
+      position: absolute;
+      top: -4px;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #ffffff;
+      box-shadow: 0 0 8px rgba(0, 0, 0, 0.8), 0 0 12px var(--blue);
+      transform: translateX(-50%);
+    }
+
+    /* Metric Grid */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.75rem;
+      background: rgba(0, 0, 0, 0.2);
+      padding: 0.85rem;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+    }
+
+    .metric-item {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+    }
+
+    .metric-label {
+      font-size: 0.68rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .metric-val {
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    /* Breadth / Advance-Decline bar */
+    .breadth-box {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .breadth-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.72rem;
+      font-family: var(--font-mono);
+    }
+
+    .breadth-track {
+      height: 5px;
+      display: flex;
+      border-radius: 3px;
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .breadth-adv {
+      background: var(--green);
+      height: 100%;
+    }
+
+    .breadth-dec {
+      background: var(--red);
+      height: 100%;
+    }
+
+    /* Settings Modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(8px);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+
+    .modal-overlay.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      max-width: 540px;
+      width: 100%;
+      padding: 1.75rem;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-header h3 {
+      font-size: 1.15rem;
+      font-weight: 700;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .form-group label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    .form-control {
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 0.6rem 0.85rem;
+      color: var(--text-primary);
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      outline: none;
+      transition: border-color 0.15s ease;
+    }
+
+    .form-control:focus {
+      border-color: var(--blue);
+    }
+
+    .helper-text {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    .preset-btns {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .preset-btn {
+      font-size: 0.72rem;
+      padding: 0.3rem 0.6rem;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-color);
+      color: var(--text-secondary);
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .preset-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+    }
+
+    /* Footer */
+    footer {
+      margin-top: auto;
+      border-top: 1px solid var(--border-color);
+      background: rgba(10, 14, 23, 0.95);
+      padding: 1.5rem 1.25rem;
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    footer a {
+      color: #60a5fa;
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+
+    /* Responsive */
+    @media (max-width: 640px) {
+      .header-inner {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .header-actions {
+        width: 100%;
+        justify-content: space-between;
+      }
+      .indices-grid {
+        grid-template-columns: 1fr;
+      }
+      .metrics-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sticky Header -->
+  <header>
+    <div class="header-inner">
+      <div class="brand">
+        <div class="brand-logo">N</div>
+        <div class="brand-info">
+          <h1>NIFTY Live Indices <span class="tag">NSE India</span></h1>
+          <p>Real-Time Index Tracker via Method 2 Backend Proxy</p>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <!-- Market Status -->
+        <div class="status-badge" id="market-status-badge">
+          <span class="dot" id="market-dot"></span>
+          <span id="market-status-text">Checking market...</span>
+        </div>
+
+        <!-- Connection Source Badge -->
+        <div class="status-badge" id="proxy-source-badge" title="Data connection source">
+          <span class="dot live" id="connection-dot"></span>
+          <span id="proxy-source-text">Proxy: Local</span>
+        </div>
+
+        <!-- Countdown Pill -->
+        <div class="timer-pill" id="timer-pill" title="Next automatic refresh countdown">
+          ⏱️ <span id="countdown-text">60s</span>
+        </div>
+
+        <!-- Refresh Button -->
+        <button class="btn btn-primary" id="refresh-btn" title="Refresh data immediately">
+          <svg id="refresh-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
+          </svg>
+          <span>Refresh</span>
+        </button>
+
+        <!-- Settings Button -->
+        <button class="btn btn-icon" id="settings-btn" title="Configure backend proxy & refresh rate">
+          ⚙️
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="container">
+    
+    <!-- Top Summary Ribbon -->
+    <section class="overview-ribbon">
+      <div class="ribbon-item">
+        <span class="ribbon-label">Indices Tracked</span>
+        <span class="ribbon-val" id="total-indices-count">5 Indices</span>
+      </div>
+
+      <div class="ribbon-item">
+        <span class="ribbon-label">Market Breadth (Adv / Dec)</span>
+        <span class="ribbon-val" id="total-breadth-val">
+          <span style="color: var(--green);" id="total-advances">--</span>
+          <span style="color: var(--text-muted); font-size: 0.85rem;">vs</span>
+          <span style="color: var(--red);" id="total-declines">--</span>
+        </span>
+      </div>
+
+      <div class="ribbon-item">
+        <span class="ribbon-label">Top Gainer Today</span>
+        <span class="ribbon-val" style="color: var(--green);" id="top-performer-val">--</span>
+      </div>
+
+      <div class="ribbon-item">
+        <span class="ribbon-label">NSE Last Updated</span>
+        <span class="ribbon-val" style="font-size: 0.95rem;" id="last-updated-val">--</span>
+      </div>
+    </section>
+
+    <!-- 5 Indices Cards Grid -->
+    <section class="indices-grid" id="indices-container">
+      <!-- Cards dynamically rendered here -->
+      <div style="grid-column: 1 / -1; text-align: center; padding: 4rem; color: var(--text-muted);">
+        <p>Loading live indices data...</p>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Settings Modal -->
+  <div class="modal-overlay" id="settings-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Backend Proxy & Refresh Settings</h3>
+        <button class="btn btn-icon" id="close-modal-btn">✕</button>
+      </div>
+
+      <div class="form-group">
+        <label for="proxy-input">Backend Proxy API Endpoint</label>
+        <input type="text" id="proxy-input" class="form-control" placeholder="http://localhost:3000/api/indices">
+        <p class="helper-text">
+          GitHub Pages uses this backend proxy to fetch live NSE data without CORS / Akamai blocks.
+        </p>
+        
+        <div class="preset-btns">
+          <button class="preset-btn" data-preset="local">Local Node Server (localhost:3000)</button>
+          <button class="preset-btn" data-preset="static">Static data.json (Offline/Snapshot)</button>
+          <button class="preset-btn" data-preset="cloudflare">Cloudflare Worker (Custom)</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="refresh-interval-select">Auto-Refresh Interval (while page is open)</label>
+        <select id="refresh-interval-select" class="form-control">
+          <option value="30">Every 30 seconds</option>
+          <option value="60" selected>Every 1 minute (Default)</option>
+          <option value="120">Every 2 minutes</option>
+          <option value="300">Every 5 minutes</option>
+          <option value="0">Disabled (Manual only)</option>
+        </select>
+        <p class="helper-text">
+          To save energy and bandwidth, refreshing automatically pauses when this browser tab is hidden and resumes when you switch back.
+        </p>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 0.5rem;">
+        <button class="btn" id="test-proxy-btn">Test Connection</button>
+        <button class="btn btn-primary" id="save-settings-btn">Save & Refresh</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <p>
+      Data sourced directly from <strong>NSE India</strong> via Method 2 Backend Proxy.
+      Designed for <a href="https://github.com/vkamthe/nifty-live-indices" target="_blank">vkamthe/nifty-live-indices</a>.
+    </p>
+    <p style="margin-top: 0.4rem; font-size: 0.72rem; color: var(--text-muted);">
+      Disclaimer: Market data is provided for educational and analytical purposes.
+    </p>
+  </footer>
+
+  <script>
+    // Configuration & State
+    const CONFIG = {
+      defaultInterval: 60, // 1 minute
+      defaultProxy: 'http://localhost:3000/api/indices',
+      staticFallback: 'data.json',
+      targetIndices: [
+        { key: 'NIFTY 50', category: 'Large Cap (50)', label: 'NIFTY 50' },
+        { key: 'NIFTY MIDCAP 100', category: 'Mid Cap (100)', label: 'NIFTY MIDCAP 100' },
+        { key: 'NIFTY SMALLCAP 250', category: 'Small Cap (250)', label: 'NIFTY SMLCAP 250' },
+        { key: 'NIFTY MICROCAP 250', category: 'Micro Cap (250)', label: 'NIFTY MICROCAP 250' },
+        { key: 'NIFTY 500', category: 'Broad Market (500)', label: 'NIFTY 500' }
+      ]
+    };
+
+    let state = {
+      proxyUrl: localStorage.getItem('nifty_proxy_url') || CONFIG.defaultProxy,
+      refreshInterval: parseInt(localStorage.getItem('nifty_refresh_sec') || '60', 10),
+      countdown: 60,
+      timerId: null,
+      isFetching: false,
+      lastFetchTime: 0,
+      previousData: {},
+      isPageVisible: true
+    };
+
+    // DOM Elements
+    const elements = {
+      indicesContainer: document.getElementById('indices-container'),
+      refreshBtn: document.getElementById('refresh-btn'),
+      refreshIcon: document.getElementById('refresh-icon'),
+      countdownText: document.getElementById('countdown-text'),
+      timerPill: document.getElementById('timer-pill'),
+      marketDot: document.getElementById('market-dot'),
+      marketStatusText: document.getElementById('market-status-text'),
+      proxySourceText: document.getElementById('proxy-source-text'),
+      connectionDot: document.getElementById('connection-dot'),
+      totalAdvances: document.getElementById('total-advances'),
+      totalDeclines: document.getElementById('total-declines'),
+      topPerformerVal: document.getElementById('top-performer-val'),
+      lastUpdatedVal: document.getElementById('last-updated-val'),
+      settingsBtn: document.getElementById('settings-btn'),
+      settingsModal: document.getElementById('settings-modal'),
+      closeModalBtn: document.getElementById('close-modal-btn'),
+      saveSettingsBtn: document.getElementById('save-settings-btn'),
+      testProxyBtn: document.getElementById('test-proxy-btn'),
+      proxyInput: document.getElementById('proxy-input'),
+      refreshIntervalSelect: document.getElementById('refresh-interval-select')
+    };
+
+    // Indian Currency Number Formatter
+    function formatINR(number) {
+      if (number === null || number === undefined || isNaN(number)) return '--';
+      return Number(number).toLocaleString('en-IN', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
+    }
+
+    // Check NSE Market Hours (IST: 09:15 to 15:30 on weekdays Mon-Fri)
+    function checkMarketStatus() {
+      const now = new Date();
+      // Convert to IST (UTC + 5:30)
+      const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+      const istTime = new Date(utc + (3600000 * 5.5));
+      const day = istTime.getDay(); // 0 is Sunday, 6 is Saturday
+      const hours = istTime.getHours();
+      const minutes = istTime.getMinutes();
+      const currentMinutes = hours * 60 + minutes;
+
+      const openMinutes = 9 * 60 + 15;   // 09:15 IST
+      const closeMinutes = 15 * 60 + 30; // 15:30 IST
+
+      const isWeekday = day >= 1 && day <= 5;
+      const isOpen = isWeekday && (currentMinutes >= openMinutes && currentMinutes < closeMinutes);
+
+      if (isOpen) {
+        elements.marketDot.className = 'dot live';
+        elements.marketStatusText.textContent = 'NSE Market Live';
+      } else {
+        elements.marketDot.className = 'dot paused';
+        elements.marketStatusText.textContent = isWeekday && currentMinutes < openMinutes 
+          ? 'Pre-Market (Opens 09:15 IST)' 
+          : 'NSE Market Closed';
+      }
+    }
+
+    // Fetch Indices from active Proxy (with fallback to data.json)
+    async function fetchIndices(isManual = false) {
+      if (state.isFetching) return;
+      state.isFetching = true;
+      elements.refreshIcon.classList.add('spin');
+
+      const startTime = performance.now();
+      let payload = null;
+      let usedSource = 'proxy';
+
+      // 1. Attempt user's configured proxy
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 6000);
+
+        const res = await fetch(state.proxyUrl, {
+          signal: controller.signal,
+          headers: { 'Accept': 'application/json' }
+        });
+        clearTimeout(timeoutId);
+
+        if (res.ok) {
+          payload = await res.json();
+          const latency = Math.round(performance.now() - startTime);
+          elements.proxySourceText.textContent = state.proxyUrl.includes('localhost') 
+            ? `Local Proxy (${latency}ms)` 
+            : `Live Proxy (${latency}ms)`;
+          elements.connectionDot.className = 'dot live';
+        } else {
+          throw new Error(`Proxy status: ${res.status}`);
+        }
+      } catch (proxyErr) {
+        console.warn('Proxy fetch failed, falling back to static data.json:', proxyErr.message);
+        
+        // 2. Fallback to repository data.json
+        try {
+          const fallbackRes = await fetch(CONFIG.staticFallback + '?t=' + Date.now());
+          if (fallbackRes.ok) {
+            payload = await fallbackRes.json();
+            usedSource = 'static';
+            elements.proxySourceText.textContent = 'Static Snapshot';
+            elements.connectionDot.className = 'dot paused';
+          }
+        } catch (fbErr) {
+          console.error('All fetch strategies failed:', fbErr);
+        }
+      }
+
+      state.isFetching = false;
+      elements.refreshIcon.classList.remove('spin');
+      state.lastFetchTime = Date.now();
+
+      if (payload && payload.data) {
+        renderIndices(payload.data, payload.timestamp);
+      } else if (!isManual) {
+        // If initial load failed completely
+        elements.indicesContainer.innerHTML = `
+          <div style="grid-column: 1 / -1; text-align: center; padding: 3rem; background: var(--bg-card); border-radius: 12px; border: 1px solid var(--border-color);">
+            <h3 style="color: var(--amber); margin-bottom: 0.5rem;">Could not connect to proxy</h3>
+            <p style="color: var(--text-muted); font-size: 0.9rem; max-width: 500px; margin: 0 auto 1.5rem;">
+              Make sure your local Node proxy is running (<code>npm start</code>) or click Settings to configure a Cloudflare Worker / static snapshot.
+            </p>
+            <button class="btn btn-primary" onclick="openSettings()">Open Settings</button>
+          </div>
+        `;
+      }
+
+      // Reset countdown
+      resetCountdown();
+    }
+
+    // Render cards and update metrics
+    function renderIndices(items, timestamp) {
+      if (timestamp) {
+        elements.lastUpdatedVal.textContent = timestamp;
+      }
+
+      let totalAdv = 0;
+      let totalDec = 0;
+      let topPerformer = { name: '--', pct: -Infinity };
+
+      // Map item by index name
+      const itemMap = {};
+      items.forEach(it => { itemMap[it.name] = it; });
+
+      // Generate Cards HTML
+      const cardsHtml = CONFIG.targetIndices.map(target => {
+        const item = itemMap[target.key];
+        if (!item) return '';
+
+        const ltp = Number(item.last);
+        const variation = Number(item.variation);
+        const pct = Number(item.percentChange);
+        const isPositive = variation >= 0;
+
+        // Advances / Declines
+        const adv = parseInt(item.advances || '0', 10);
+        const dec = parseInt(item.declines || '0', 10);
+        totalAdv += adv;
+        totalDec += dec;
+
+        if (pct > topPerformer.pct) {
+          topPerformer = { name: target.label, pct: pct };
+        }
+
+        // Intraday Low / High Position %
+        const dayLow = Number(item.low);
+        const dayHigh = Number(item.high);
+        let rangePercent = 50;
+        if (dayHigh > dayLow) {
+          rangePercent = Math.max(0, Math.min(100, ((ltp - dayLow) / (dayHigh - dayLow)) * 100));
+        }
+
+        // Advance vs Decline percentage for bar
+        const totalBreadth = adv + dec;
+        const advRatio = totalBreadth > 0 ? (adv / totalBreadth) * 100 : 50;
+        const decRatio = totalBreadth > 0 ? (dec / totalBreadth) * 100 : 50;
+
+        // Check if price changed since previous tick for flash animation
+        const prevPrice = state.previousData[target.key];
+        let flashClass = '';
+        if (prevPrice !== undefined && prevPrice !== ltp) {
+          flashClass = ltp > prevPrice ? 'price-flash-green' : 'price-flash-red';
+        }
+        state.previousData[target.key] = ltp;
+
+        return `
+          <article class="index-card">
+            <!-- Card Top: Name & Category -->
+            <div class="card-top">
+              <div class="card-title-group">
+                <h2>${target.label}</h2>
+                <span class="symbol-subtitle">${item.name}</span>
+              </div>
+              <span class="category-pill">${target.category}</span>
+            </div>
+
+            <!-- Price & Change Pill -->
+            <div class="price-section">
+              <div class="ltp ${flashClass}">${formatINR(ltp)}</div>
+              <div class="change-badge ${isPositive ? 'positive' : 'negative'}">
+                <span>${isPositive ? '▲' : '▼'}</span>
+                <span>${isPositive ? '+' : ''}${formatINR(variation)}</span>
+                <span>(${isPositive ? '+' : ''}${pct.toFixed(2)}%)</span>
+              </div>
+            </div>
+
+            <!-- Intraday Range Bar -->
+            <div class="range-box">
+              <div class="range-header">
+                <span>Low: ${formatINR(dayLow)}</span>
+                <span style="color: var(--text-secondary); font-weight: 600;">Day Range</span>
+                <span>High: ${formatINR(dayHigh)}</span>
+              </div>
+              <div class="range-bar-track">
+                <div class="range-bar-fill" style="width: ${rangePercent}%;"></div>
+                <div class="range-bar-marker" style="left: ${rangePercent}%;"></div>
+              </div>
+            </div>
+
+            <!-- Detailed Fundamentals Grid -->
+            <div class="metrics-grid">
+              <div class="metric-item">
+                <span class="metric-label">Open</span>
+                <span class="metric-val">${formatINR(item.open)}</span>
+              </div>
+              <div class="metric-item">
+                <span class="metric-label">Prev Close</span>
+                <span class="metric-val">${formatINR(item.previousClose)}</span>
+              </div>
+              <div class="metric-item">
+                <span class="metric-label">P/E Ratio</span>
+                <span class="metric-val">${item.pe || '--'}</span>
+              </div>
+              <div class="metric-item">
+                <span class="metric-label">52W High</span>
+                <span class="metric-val">${formatINR(item.yearHigh)}</span>
+              </div>
+              <div class="metric-item">
+                <span class="metric-label">52W Low</span>
+                <span class="metric-val">${formatINR(item.yearLow)}</span>
+              </div>
+              <div class="metric-item">
+                <span class="metric-label">Div Yield</span>
+                <span class="metric-val">${item.dy ? item.dy + '%' : '--'}</span>
+              </div>
+            </div>
+
+            <!-- Advances / Declines Breadth Bar -->
+            <div class="breadth-box">
+              <div class="breadth-header">
+                <span style="color: var(--green);">▲ ${adv} Advances</span>
+                <span style="color: var(--red);">▼ ${dec} Declines</span>
+              </div>
+              <div class="breadth-track">
+                <div class="breadth-adv" style="width: ${advRatio}%;"></div>
+                <div class="breadth-dec" style="width: ${decRatio}%;"></div>
+              </div>
+            </div>
+          </article>
+        `;
+      }).join('');
+
+      elements.indicesContainer.innerHTML = cardsHtml;
+
+      // Update Ribbon Summary
+      elements.totalAdvances.textContent = `▲ ${totalAdv}`;
+      elements.totalDeclines.textContent = `▼ ${totalDec}`;
+      if (topPerformer.pct !== -Infinity) {
+        elements.topPerformerVal.textContent = `${topPerformer.name} (+${topPerformer.pct.toFixed(2)}%)`;
+      }
+    }
+
+    // Auto-Refresh Countdown Manager (updates every 1s)
+    function startCountdown() {
+      if (state.timerId) clearInterval(state.timerId);
+
+      state.countdown = state.refreshInterval;
+
+      state.timerId = setInterval(() => {
+        // If auto-refresh is disabled in settings
+        if (state.refreshInterval <= 0) {
+          elements.countdownText.textContent = 'Manual';
+          return;
+        }
+
+        // If tab is currently hidden/inactive, freeze timer
+        if (!state.isPageVisible) return;
+
+        state.countdown--;
+        elements.countdownText.textContent = `${state.countdown}s`;
+
+        if (state.countdown <= 0) {
+          fetchIndices();
+        }
+      }, 1000);
+    }
+
+    function resetCountdown() {
+      state.countdown = state.refreshInterval;
+      elements.countdownText.textContent = `${state.countdown}s`;
+    }
+
+    // Page Visibility API: Pause when tab is hidden, refresh immediately when tab is opened
+    document.addEventListener('visibilitychange', () => {
+      state.isPageVisible = (document.visibilityState === 'visible');
+
+      if (state.isPageVisible) {
+        elements.timerPill.style.opacity = '1';
+        // If more than 60s passed while tab was away, trigger fresh fetch
+        const elapsed = (Date.now() - state.lastFetchTime) / 1000;
+        if (elapsed >= state.refreshInterval) {
+          fetchIndices();
+        }
+      } else {
+        elements.timerPill.style.opacity = '0.5';
+      }
+    });
+
+    // Event Listeners
+    elements.refreshBtn.addEventListener('click', () => {
+      fetchIndices(true);
+    });
+
+    // Settings Modal Open/Close
+    function openSettings() {
+      elements.proxyInput.value = state.proxyUrl;
+      elements.refreshIntervalSelect.value = state.refreshInterval;
+      elements.settingsModal.classList.add('open');
+    }
+
+    function closeSettings() {
+      elements.settingsModal.classList.remove('open');
+    }
+
+    elements.settingsBtn.addEventListener('click', openSettings);
+    elements.closeModalBtn.addEventListener('click', closeSettings);
+    elements.settingsModal.addEventListener('click', (e) => {
+      if (e.target === elements.settingsModal) closeSettings();
+    });
+
+    // Presets in modal
+    document.querySelectorAll('.preset-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const preset = btn.getAttribute('data-preset');
+        if (preset === 'local') {
+          elements.proxyInput.value = 'http://localhost:3000/api/indices';
+        } else if (preset === 'static') {
+          elements.proxyInput.value = 'data.json';
+        } else if (preset === 'cloudflare') {
+          elements.proxyInput.value = 'https://nifty-indices-proxy.YOUR_SUBDOMAIN.workers.dev/api/indices';
+        }
+      });
+    });
+
+    // Test proxy connection
+    elements.testProxyBtn.addEventListener('click', async () => {
+      const url = elements.proxyInput.value.trim();
+      elements.testProxyBtn.textContent = 'Testing...';
+      try {
+        const res = await fetch(url);
+        if (res.ok) {
+          alert('✅ Connection Successful! Proxy responded with status 200.');
+        } else {
+          alert(`⚠️ Server responded with status ${res.status}`);
+        }
+      } catch (err) {
+        alert(`❌ Connection Failed: ${err.message}`);
+      }
+      elements.testProxyBtn.textContent = 'Test Connection';
+    });
+
+    // Save Settings
+    elements.saveSettingsBtn.addEventListener('click', () => {
+      const newProxy = elements.proxyInput.value.trim() || CONFIG.defaultProxy;
+      const newInterval = parseInt(elements.refreshIntervalSelect.value, 10);
+
+      state.proxyUrl = newProxy;
+      state.refreshInterval = newInterval;
+
+      localStorage.setItem('nifty_proxy_url', newProxy);
+      localStorage.setItem('nifty_refresh_sec', newInterval.toString());
+
+      closeSettings();
+      fetchIndices(true);
+    });
+
+    // Initialization
+    function init() {
+      checkMarketStatus();
+      setInterval(checkMarketStatus, 30000); // Check market open/close every 30s
+      startCountdown();
+      fetchIndices(); // Initial data fetch
+    }
+
+    window.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>

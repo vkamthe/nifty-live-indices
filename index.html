@@ -679,6 +679,31 @@
       color: #60a5fa;
     }
 
+    .preset-btns {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-top: 0.25rem;
+    }
+
+    .preset-btn {
+      font-size: 0.72rem;
+      padding: 0.3rem 0.65rem;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-color);
+      color: var(--text-secondary);
+      border-radius: 6px;
+      cursor: pointer;
+      font-family: var(--font-sans);
+      transition: all 0.15s ease;
+    }
+
+    .preset-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--text-primary);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
     /* Footer */
     footer {
       margin-top: auto;
@@ -820,6 +845,19 @@
         </p>
       </div>
 
+      <!-- Data Feed / Proxy Setting -->
+      <div class="form-group">
+        <label for="proxy-input">Data Feed / Backend Proxy URL</label>
+        <input type="text" id="proxy-input" class="form-control" placeholder="data.json or http://localhost:3000/api/indices">
+        <div class="preset-btns">
+          <button type="button" class="preset-btn" data-preset="snapshot">GitHub Snapshot (data.json)</button>
+          <button type="button" class="preset-btn" data-preset="local">Local Proxy (localhost:3000)</button>
+        </div>
+        <p class="helper-text">
+          On GitHub Pages, default is the repository snapshot (auto-updated during trading hours). If running <code>npm start</code> locally or using a Cloudflare Worker proxy, enter your endpoint here for live real-time ticks.
+        </p>
+      </div>
+
       <div style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 0.5rem;">
         <button class="btn btn-primary" id="save-settings-btn">Done</button>
       </div>
@@ -895,7 +933,8 @@
       saveSettingsBtn: document.getElementById('save-settings-btn'),
       themeBtnDark: document.getElementById('theme-btn-dark'),
       themeBtnLight: document.getElementById('theme-btn-light'),
-      refreshIntervalSelect: document.getElementById('refresh-interval-select')
+      refreshIntervalSelect: document.getElementById('refresh-interval-select'),
+      proxyInput: document.getElementById('proxy-input')
     };
 
     // Indian Currency Number Formatter
@@ -909,10 +948,9 @@
 
     // Check NSE Market Hours (IST: 09:15 to 15:30 on weekdays Mon-Fri)
     function checkMarketStatus() {
-      const now = new Date();
-      // Convert to IST (UTC + 5:30)
-      const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
-      const istTime = new Date(utc + (3600000 * 5.5));
+      // Robust calculation using Indian Standard Time (Asia/Kolkata)
+      const istString = new Date().toLocaleString('en-US', { timeZone: 'Asia/Kolkata' });
+      const istTime = new Date(istString);
       const day = istTime.getDay(); // 0 is Sunday, 6 is Saturday
       const hours = istTime.getHours();
       const minutes = istTime.getMinutes();
@@ -930,7 +968,7 @@
       if (isOpen) {
         elements.marketDot.className = 'dot live';
         elements.marketStatusText.textContent = 'NSE Market Live';
-        elements.timerPill.title = 'Auto-refreshing every 1 min while market is open';
+        elements.timerPill.title = 'Auto-refreshing while market is open';
         // If market transitioned from closed to open, restart countdown
         if (!wasOpen) {
           resetCountdown();
@@ -955,13 +993,20 @@
       let payload = null;
       let usedSource = 'proxy';
 
-      // 1. Attempt user's configured proxy
+      // 1. Attempt user's configured proxy / feed URL
       try {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 6000);
 
-        const res = await fetch(state.proxyUrl, {
+        let targetUrl = state.proxyUrl;
+        if (targetUrl.includes('data.json')) {
+          const sep = targetUrl.includes('?') ? '&' : '?';
+          targetUrl = `${targetUrl}${sep}t=${Date.now()}`;
+        }
+
+        const res = await fetch(targetUrl, {
           signal: controller.signal,
+          cache: 'no-store',
           headers: { 'Accept': 'application/json' }
         });
         clearTimeout(timeoutId);
@@ -969,7 +1014,7 @@
         if (res.ok) {
           payload = await res.json();
           const latency = Math.round(performance.now() - startTime);
-          if (state.proxyUrl === 'data.json') {
+          if (state.proxyUrl.includes('data.json')) {
             elements.proxySourceText.textContent = 'NSE Snapshot Feed';
             elements.connectionDot.className = 'dot live';
           } else if (state.proxyUrl.includes('localhost')) {
@@ -980,14 +1025,16 @@
             elements.connectionDot.className = 'dot live';
           }
         } else {
-          throw new Error(`Proxy status: ${res.status}`);
+          throw new Error(`Feed status: ${res.status}`);
         }
       } catch (proxyErr) {
         console.warn('Proxy fetch failed, falling back to static data.json:', proxyErr.message);
         
-        // 2. Fallback to repository data.json
+        // 2. Fallback to repository data.json (with cache-busting)
         try {
-          const fallbackRes = await fetch(CONFIG.staticFallback + '?t=' + Date.now());
+          const fallbackRes = await fetch(CONFIG.staticFallback + '?t=' + Date.now(), {
+            cache: 'no-store'
+          });
           if (fallbackRes.ok) {
             payload = await fallbackRes.json();
             usedSource = 'static';
@@ -1230,6 +1277,7 @@
 
     // Preferences Modal Open/Close
     function openSettings() {
+      if (elements.proxyInput) elements.proxyInput.value = state.proxyUrl;
       elements.refreshIntervalSelect.value = state.refreshInterval;
       if (state.theme === 'light') {
         elements.themeBtnLight.classList.add('active');
@@ -1244,6 +1292,18 @@
     function closeSettings() {
       elements.settingsModal.classList.remove('open');
     }
+
+    // Preset button shortcuts
+    document.querySelectorAll('.preset-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const preset = btn.getAttribute('data-preset');
+        if (preset === 'local') {
+          if (elements.proxyInput) elements.proxyInput.value = 'http://localhost:3000/api/indices';
+        } else if (preset === 'snapshot') {
+          if (elements.proxyInput) elements.proxyInput.value = 'data.json';
+        }
+      });
+    });
 
     // Event Listeners
     elements.refreshBtn.addEventListener('click', () => {
@@ -1264,6 +1324,17 @@
       const newInterval = parseInt(elements.refreshIntervalSelect.value, 10);
       state.refreshInterval = newInterval;
       localStorage.setItem('nifty_refresh_sec', newInterval.toString());
+
+      if (elements.proxyInput) {
+        const newProxy = elements.proxyInput.value.trim() || CONFIG.defaultProxy;
+        const changed = state.proxyUrl !== newProxy;
+        state.proxyUrl = newProxy;
+        localStorage.setItem('nifty_proxy_url', newProxy);
+        if (changed) {
+          fetchIndices(true);
+        }
+      }
+
       resetCountdown();
       closeSettings();
     });

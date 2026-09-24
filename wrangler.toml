@@ -1,6 +1,0 @@
-name = "nifty-indices-proxy"
-main = "worker.js"
-compatibility_date = "2024-09-01"
-
-[observability]
-enabled = true

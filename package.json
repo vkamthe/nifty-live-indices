@@ -1,12 +1,9 @@
 {
   "name": "nifty-live-indices",
   "version": "1.0.0",
-  "description": "Live NSE India Indices Dashboard & Backend Proxy updating every 1 minute",
-  "main": "server.js",
+  "description": "NSE India Indices Dashboard hosted on GitHub Pages with automated updates via GitHub Actions",
   "scripts": {
-    "start": "node server.js",
-    "fetch": "node fetch.js",
-    "worker:deploy": "npx wrangler deploy"
+    "fetch": "node fetch.js"
   },
   "keywords": [
     "nifty",
@@ -14,8 +11,8 @@
     "stock-market",
     "indices",
     "nifty50",
-    "proxy",
-    "github-pages"
+    "github-pages",
+    "github-actions"
   ],
   "author": "Vikram Kamthe",
   "license": "MIT"

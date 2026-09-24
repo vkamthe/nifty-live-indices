@@ -1,14 +1,14 @@
 # 📈 NIFTY Live Indices Tracker (NSE India)
 
-Live, responsive stock market dashboard tracking key National Stock Exchange of India (NSE) indices in real-time. Built to fulfill **Method 2: Direct NSE India Public API with a Backend Proxy** and hosted directly on **GitHub Pages**.
+Clean, responsive financial dashboard tracking key National Stock Exchange of India (NSE) indices. Hosted 100% free on **GitHub Pages** with automated data updates powered by **GitHub Actions** (no external accounts, servers, or paid proxies required).
 
-🔗 **Live GitHub Page:** [https://vkamthe.github.io/nifty-live-indices/](https://vkamthe.github.io/nifty-live-indices/)
+🔗 **Live Dashboard:** [https://vkamthe.github.io/nifty-live-indices/](https://vkamthe.github.io/nifty-live-indices/)
 
 ---
 
 ## 🎯 Indices Tracked
 
-The dashboard actively tracks all 5 requested benchmark & broad market indices:
+The dashboard tracks all 5 benchmark and broad market indices:
 1. **NIFTY 50** (`NIFTY 50`) — India's benchmark blue-chip index
 2. **NIFTY MIDCAP 100** (`NIFTY MIDCAP 100`) — Top 100 mid-sized companies
 3. **NIFTY SMLCAP 250** (`NIFTY SMALLCAP 250`) — Small-cap universe
@@ -17,82 +17,36 @@ The dashboard actively tracks all 5 requested benchmark & broad market indices:
 
 ---
 
-## ⚡ How It Works (Method 2 Architecture)
+## ⚡ Architecture (Pure GitHub Pages + GitHub Actions)
 
 ```
 [Browser Client (GitHub Pages)]
        │
-       ▼ (polls every 1 min while page is active)
-[Backend Proxy (Localhost / Cloudflare Worker / Vercel)]
+       ▼ (polls data.json with cache-busting)
+[data.json (Repository Snapshot)]
+       ▲
+       │ (cron runs every 15 mins during NSE market hours)
+[GitHub Actions (.github/workflows/update.yml)]
        │
-       ▼ (Akamai Cookie Handshake + /api/allIndices)
-[NSE India (Official Public API)]
+       ▼ (session cookie handshake + /api/allIndices)
+[NSE India Official API]
 ```
 
-### Why a Backend Proxy is Required
-1. **CORS Restrictions:** Web browsers block direct client-side JavaScript requests to `https://www.nseindia.com/api/allIndices` due to Cross-Origin Resource Sharing policies.
-2. **Akamai Bot Defense:** NSE requires a preliminary cookie handshake from `https://www.nseindia.com` before serving index data.
-3. **GitHub Pages is Static:** GitHub Pages only serves static files (HTML/CSS/JS). The proxy bridges the browser and NSE by handling headers, session cookies, and adding `Access-Control-Allow-Origin: *`.
+### Why This Architecture?
+- **Zero Third-Party Accounts:** Runs entirely within GitHub—no Cloudflare, Vercel, or external servers needed.
+- **Bypasses Browser CORS:** GitHub Actions runs in an isolated runner environment, safely handling the NSE session handshake and writing clean JSON to `data.json`.
+- **Cache-Busted Client:** The web dashboard fetches `data.json?t=<timestamp>` with `cache: 'no-store'`, guaranteeing you never receive stale browser-cached data.
 
 ---
 
-## ⏱️ Auto-Update Features
+## ⏱️ Features
 
-- **1-Minute Automatic Polling:** While the page is open, the dashboard automatically fetches fresh data every 60 seconds.
-- **Tab Visibility Aware:** Utilizes the HTML5 `Page Visibility API` (`document.visibilityState`). If you switch to another tab or minimize the browser, the countdown timer **pauses** to save battery and network bandwidth. As soon as you switch back, it refreshes immediately!
-- **Tick Flashes:** When index prices update, changed values briefly pulse green (if price rose) or red (if price declined).
-- **Graceful Fallback:** If no backend proxy is running locally, the page seamlessly serves the bundled `data.json` snapshot so the UI is never blank.
-
----
-
-## 🚀 Running the Project
-
-### Option A: Local Node.js Proxy (Recommended for Local Dev)
-The repository includes a zero-dependency Node.js proxy server using native Node 18+ `fetch`:
-
-```bash
-# Clone the repository
-git clone https://github.com/vkamthe/nifty-live-indices.git
-cd nifty-live-indices
-
-# Start the proxy server (runs on http://localhost:3000)
-npm start
-```
-
-Open `http://localhost:3000` in your browser. The dashboard will automatically query `http://localhost:3000/api/indices`.
-
----
-
-### Option B: 100% Free Cloudflare Worker (Global Edge Proxy)
-Deploy the included `worker.js` to Cloudflare Workers (100,000 requests/day free):
-
-1. Install Wrangler CLI (if not already installed):
-   ```bash
-   npx wrangler login
-   ```
-2. Deploy the worker:
-   ```bash
-   npx wrangler deploy
-   ```
-3. Cloudflare will give you a URL like:
-   `https://nifty-indices-proxy.<subdomain>.workers.dev/api/indices`
-4. Open your GitHub Page, click the **⚙️ Settings** icon in the header, paste your worker URL, and click **Save**.
-
----
-
-### Option C: Vercel Serverless Function
-If you link this GitHub repository to [Vercel](https://vercel.com):
-- The `api/indices.js` serverless function deploys automatically.
-- Your proxy endpoint will be: `https://<your-project>.vercel.app/api/indices`.
-
----
-
-### Option D: Manual Snapshot Fetch (CLI)
-You can refresh the offline snapshot file (`data.json`) anytime by running:
-```bash
-node fetch.js
-```
-A GitHub Actions workflow (`.github/workflows/update.yml`) is also configured to run hourly during NSE trading sessions (Mon-Fri 09:15 - 15:30 IST) to keep `data.json` fresh.
+- **Automated Market-Hours Cron:** GitHub Actions automatically runs every 15 minutes during NSE trading sessions (**Mon–Fri 09:15 to 15:45 IST** / `03:45 to 10:15 UTC`).
+- **Tab Visibility Aware:** Utilizes HTML5 `Page Visibility API`. Refresh timers pause when the tab is inactive or minimized, and refresh immediately when you switch back.
+- **Market Status Indicator:** Automatically detects market hours (09:15–15:30 IST) and pauses polling when the market is closed or on weekends.
+- **Theme Support:** One-click toggle between **Dark Mode** and **Light Mode** with persistence in `localStorage`.
+- **Configurable Refresh Rate:** Choose auto-refresh intervals (1m, 2m, 5m, 15m, or Manual) in Dashboard Preferences (`⚙️`).
+- **Tick Flashes:** Price cards flash green (gains) or red (declines) when new prices load.
 
 ---
 
@@ -100,32 +54,53 @@ A GitHub Actions workflow (`.github/workflows/update.yml`) is also configured to
 
 ```
 nifty-live-indices/
-├── index.html                  # Responsive Dark-mode Financial Dashboard (GitHub Pages)
-├── server.js                   # Node.js backend proxy with in-memory caching & CORS
-├── worker.js                   # Cloudflare Worker script for serverless edge proxying
-├── wrangler.toml               # Cloudflare Worker config
-├── fetch.js                    # CLI script to download fresh data.json from NSE
-├── data.json                   # Snapshot dataset of all 5 target indices
-├── package.json                # npm scripts & metadata
-├── api/
-│   └── indices.js              # Vercel Serverless Function endpoint
+├── index.html                  # Responsive Financial Dashboard (GitHub Pages)
+├── fetch.js                    # Fetch script querying NSE India and generating data.json
+├── data.json                   # Latest market snapshot dataset (5 indices)
+├── package.json                # Project metadata and fetch script
 └── .github/
     └── workflows/
-        └── update.yml          # GitHub Actions cron to update data.json during market hours
+        └── update.yml          # GitHub Actions cron updating data.json every 15 mins
 ```
 
 ---
 
-## 📊 Sample Output Data (NSE India)
+## 🚀 Running / Fetching Locally
+
+To manually update the local `data.json` snapshot:
+
+```bash
+# Clone the repository
+git clone https://github.com/vkamthe/nifty-live-indices.git
+cd nifty-live-indices
+
+# Fetch the latest indices from NSE India
+npm run fetch
+```
+
+To preview the dashboard locally, simply open `index.html` in any web browser or run:
+```bash
+npx serve .
+```
+
+---
+
+## 📊 Sample Output Data (`data.json`)
 
 ```json
-[
-  { "name": "NIFTY 50", "last": 23446.80, "variation": 117.80, "percentChange": 0.50 },
-  { "name": "NIFTY MIDCAP 100", "last": 62396.45, "variation": 433.30, "percentChange": 0.70 },
-  { "name": "NIFTY SMALLCAP 250", "last": 18411.40, "variation": 150.80, "percentChange": 0.83 },
-  { "name": "NIFTY MICROCAP 250", "last": 26794.10, "variation": 342.20, "percentChange": 1.29 },
-  { "name": "NIFTY 500", "last": 22935.10, "variation": 140.90, "percentChange": 0.62 }
-]
+{
+  "source": "NSE India (Official Public API via Proxy)",
+  "timestamp": "24-Sep-2026 14:56",
+  "fetchedAt": "2026-09-24T09:28:15.000Z",
+  "count": 5,
+  "data": [
+    { "name": "NIFTY 50", "last": 23115.70, "variation": -331.10, "percentChange": -1.41 },
+    { "name": "NIFTY 500", "last": 22597.65, "variation": -337.45, "percentChange": -1.47 },
+    { "name": "NIFTY MIDCAP 100", "last": 61092.65, "variation": -1303.80, "percentChange": -2.09 },
+    { "name": "NIFTY SMALLCAP 250", "last": 18173.35, "variation": -238.05, "percentChange": -1.29 },
+    { "name": "NIFTY MICROCAP 250", "last": 26444.45, "variation": -349.65, "percentChange": -1.30 }
+  ]
+}
 ```
 
 ---

@@ -679,31 +679,6 @@
       color: #60a5fa;
     }
 
-    .preset-btns {
-      display: flex;
-      gap: 0.5rem;
-      flex-wrap: wrap;
-      margin-top: 0.25rem;
-    }
-
-    .preset-btn {
-      font-size: 0.72rem;
-      padding: 0.3rem 0.65rem;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid var(--border-color);
-      color: var(--text-secondary);
-      border-radius: 6px;
-      cursor: pointer;
-      font-family: var(--font-sans);
-      transition: all 0.15s ease;
-    }
-
-    .preset-btn:hover {
-      background: rgba(255, 255, 255, 0.1);
-      color: var(--text-primary);
-      border-color: rgba(255, 255, 255, 0.2);
-    }
-
     /* Footer */
     footer {
       margin-top: auto;
@@ -764,9 +739,9 @@
         </div>
 
         <!-- Connection Source Badge -->
-        <div class="status-badge" id="proxy-source-badge" title="Data connection source">
+        <div class="status-badge" id="proxy-source-badge" title="Data Feed: NSE India (via GitHub Actions)">
           <span class="dot live" id="connection-dot"></span>
-          <span id="proxy-source-text">Proxy: Local</span>
+          <span id="proxy-source-text">NSE India Feed</span>
         </div>
 
         <!-- Countdown Pill -->
@@ -831,31 +806,16 @@
 
       <!-- Refresh Rate Setting -->
       <div class="form-group">
-        <label for="refresh-interval-select">Auto-Refresh Interval (During Market Hours)</label>
+        <label for="refresh-interval-select">Auto-Refresh Interval</label>
         <select id="refresh-interval-select" class="form-control">
-          <option value="30">Every 30 seconds</option>
           <option value="60" selected>Every 1 minute (Default)</option>
           <option value="120">Every 2 minutes</option>
-          <option value="180">Every 3 minutes</option>
           <option value="300">Every 5 minutes</option>
+          <option value="900">Every 15 minutes (Matches GitHub Actions cron)</option>
           <option value="0">Manual Only (Disable auto-refresh)</option>
         </select>
         <p class="helper-text">
-          Auto-refresh runs while the market is open (09:15–15:30 IST) and automatically pauses when the market is closed or when this browser tab is hidden.
-        </p>
-      </div>
-
-      <!-- Data Feed / Proxy Setting -->
-      <div class="form-group">
-        <label for="proxy-input">Data Feed / Backend Proxy URL</label>
-        <input type="text" id="proxy-input" class="form-control" placeholder="data.json or http://localhost:3000/api/indices">
-        <div class="preset-btns">
-          <button type="button" class="preset-btn" data-preset="snapshot">GitHub Snapshot (data.json)</button>
-          <button type="button" class="preset-btn" data-preset="cloudflare">Cloudflare Worker (Custom)</button>
-          <button type="button" class="preset-btn" data-preset="local">Local Proxy (localhost:3000)</button>
-        </div>
-        <p class="helper-text">
-          On GitHub Pages, default is the repository snapshot (auto-updated during trading hours). If running <code>npm start</code> locally or using a Cloudflare Worker proxy, enter your endpoint here for live real-time ticks.
+          The dashboard automatically re-checks for fresh data while the market is open (09:15–15:30 IST) and pauses when closed or when this tab is hidden. Market data is refreshed automatically every 15 minutes by GitHub Actions.
         </p>
       </div>
 
@@ -868,8 +828,8 @@
   <!-- Footer -->
   <footer>
     <p>
-      Data sourced directly from <strong>NSE India</strong> via Method 2 Backend Proxy.
-      Designed for <a href="https://github.com/vkamthe/nifty-live-indices" target="_blank">vkamthe/nifty-live-indices</a>.
+      Data sourced directly from <strong>NSE India</strong> • Automatically updated via <strong>GitHub Actions</strong>.
+      Hosted on <a href="https://github.com/vkamthe/nifty-live-indices" target="_blank">GitHub Pages</a>.
     </p>
     <p style="margin-top: 0.4rem; font-size: 0.72rem; color: var(--text-muted);">
       Disclaimer: Market data is provided for educational and analytical purposes.
@@ -877,21 +837,9 @@
   </footer>
 
   <script>
-    // Auto-detect environment: if running on GitHub Pages / remote, default to data.json
-    const isLocalHost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-    const defaultProxyUrl = isLocalHost ? 'http://localhost:3000/api/indices' : 'data.json';
-
-    let initialProxy = localStorage.getItem('nifty_proxy_url');
-    // Clear legacy localhost default if visiting from GitHub Pages to avoid browser Local Network permission prompt
-    if (!isLocalHost && initialProxy === 'http://localhost:3000/api/indices') {
-      initialProxy = 'data.json';
-      localStorage.setItem('nifty_proxy_url', 'data.json');
-    }
-
     const CONFIG = {
       defaultInterval: 60, // 1 minute
-      defaultProxy: defaultProxyUrl,
-      staticFallback: 'data.json',
+      feedUrl: 'data.json',
       targetIndices: [
         { key: 'NIFTY 50', category: 'Large Cap (50)', label: 'NIFTY 50' },
         { key: 'NIFTY MIDCAP 100', category: 'Mid Cap (100)', label: 'NIFTY MIDCAP 100' },
@@ -902,7 +850,6 @@
     };
 
     let state = {
-      proxyUrl: initialProxy || CONFIG.defaultProxy,
       refreshInterval: parseInt(localStorage.getItem('nifty_refresh_sec') || '60', 10),
       countdown: 60,
       timerId: null,
@@ -934,8 +881,7 @@
       saveSettingsBtn: document.getElementById('save-settings-btn'),
       themeBtnDark: document.getElementById('theme-btn-dark'),
       themeBtnLight: document.getElementById('theme-btn-light'),
-      refreshIntervalSelect: document.getElementById('refresh-interval-select'),
-      proxyInput: document.getElementById('proxy-input')
+      refreshIntervalSelect: document.getElementById('refresh-interval-select')
     };
 
     // Indian Currency Number Formatter
@@ -984,7 +930,7 @@
       }
     }
 
-    // Fetch Indices from active Proxy (with fallback to data.json)
+    // Fetch Indices from data.json (with cache-busting)
     async function fetchIndices(isManual = false) {
       if (state.isFetching) return;
       state.isFetching = true;
@@ -992,19 +938,12 @@
 
       const startTime = performance.now();
       let payload = null;
-      let usedSource = 'proxy';
 
-      // 1. Attempt user's configured proxy / feed URL
       try {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 6000);
 
-        let targetUrl = state.proxyUrl;
-        if (targetUrl.includes('data.json')) {
-          const sep = targetUrl.includes('?') ? '&' : '?';
-          targetUrl = `${targetUrl}${sep}t=${Date.now()}`;
-        }
-
+        const targetUrl = `${CONFIG.feedUrl}?t=${Date.now()}`;
         const res = await fetch(targetUrl, {
           signal: controller.signal,
           cache: 'no-store',
@@ -1015,39 +954,14 @@
         if (res.ok) {
           payload = await res.json();
           const latency = Math.round(performance.now() - startTime);
-          if (state.proxyUrl.includes('data.json')) {
-            elements.proxySourceText.textContent = 'NSE Snapshot Feed';
-            elements.connectionDot.className = 'dot live';
-          } else if (state.proxyUrl.includes('localhost')) {
-            elements.proxySourceText.textContent = `Local Proxy (${latency}ms)`;
-            elements.connectionDot.className = 'dot live';
-          } else if (state.proxyUrl.includes('workers.dev')) {
-            elements.proxySourceText.textContent = `Cloudflare Edge (${latency}ms)`;
-            elements.connectionDot.className = 'dot live';
-          } else {
-            elements.proxySourceText.textContent = `Live Proxy (${latency}ms)`;
-            elements.connectionDot.className = 'dot live';
-          }
+          elements.proxySourceText.textContent = `NSE Feed (${latency}ms)`;
+          elements.connectionDot.className = 'dot live';
         } else {
           throw new Error(`Feed status: ${res.status}`);
         }
-      } catch (proxyErr) {
-        console.warn('Proxy fetch failed, falling back to static data.json:', proxyErr.message);
-        
-        // 2. Fallback to repository data.json (with cache-busting)
-        try {
-          const fallbackRes = await fetch(CONFIG.staticFallback + '?t=' + Date.now(), {
-            cache: 'no-store'
-          });
-          if (fallbackRes.ok) {
-            payload = await fallbackRes.json();
-            usedSource = 'static';
-            elements.proxySourceText.textContent = 'Static Snapshot';
-            elements.connectionDot.className = 'dot paused';
-          }
-        } catch (fbErr) {
-          console.error('All fetch strategies failed:', fbErr);
-        }
+      } catch (err) {
+        console.warn('Data fetch failed:', err.message);
+        elements.connectionDot.className = 'dot paused';
       }
 
       state.isFetching = false;
@@ -1056,8 +970,8 @@
 
       if (payload && payload.data) {
         renderIndices(payload.data, payload.timestamp);
-      } else if (!isManual) {
-        // If initial load failed completely
+      } else if (!isManual && !elements.indicesContainer.querySelector('.index-card')) {
+        // If initial load failed completely and no cards rendered
         elements.indicesContainer.innerHTML = `
           <div style="grid-column: 1 / -1; text-align: center; padding: 3rem; background: var(--bg-card); border-radius: 12px; border: 1px solid var(--border-color);">
             <h3 style="color: var(--amber); margin-bottom: 0.5rem;">Could not load market data</h3>
@@ -1281,7 +1195,6 @@
 
     // Preferences Modal Open/Close
     function openSettings() {
-      if (elements.proxyInput) elements.proxyInput.value = state.proxyUrl;
       elements.refreshIntervalSelect.value = state.refreshInterval;
       if (state.theme === 'light') {
         elements.themeBtnLight.classList.add('active');
@@ -1296,24 +1209,6 @@
     function closeSettings() {
       elements.settingsModal.classList.remove('open');
     }
-
-    // Preset button shortcuts
-    document.querySelectorAll('.preset-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const preset = btn.getAttribute('data-preset');
-        if (preset === 'local') {
-          if (elements.proxyInput) elements.proxyInput.value = 'http://localhost:3000/api/indices';
-        } else if (preset === 'snapshot') {
-          if (elements.proxyInput) elements.proxyInput.value = 'data.json';
-        } else if (preset === 'cloudflare') {
-          if (elements.proxyInput) {
-            elements.proxyInput.value = 'https://nifty-indices-proxy.YOUR_SUBDOMAIN.workers.dev';
-            elements.proxyInput.focus();
-            elements.proxyInput.setSelectionRange(28, 42);
-          }
-        }
-      });
-    });
 
     // Event Listeners
     elements.refreshBtn.addEventListener('click', () => {
@@ -1334,17 +1229,6 @@
       const newInterval = parseInt(elements.refreshIntervalSelect.value, 10);
       state.refreshInterval = newInterval;
       localStorage.setItem('nifty_refresh_sec', newInterval.toString());
-
-      if (elements.proxyInput) {
-        const newProxy = elements.proxyInput.value.trim() || CONFIG.defaultProxy;
-        const changed = state.proxyUrl !== newProxy;
-        state.proxyUrl = newProxy;
-        localStorage.setItem('nifty_proxy_url', newProxy);
-        if (changed) {
-          fetchIndices(true);
-        }
-      }
-
       resetCountdown();
       closeSettings();
     });

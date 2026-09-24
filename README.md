@@ -25,7 +25,7 @@ The dashboard tracks all 5 benchmark and broad market indices:
        ▼ (polls data.json with cache-busting)
 [data.json (Repository Snapshot)]
        ▲
-       │ (cron runs every 15 mins during NSE market hours)
+       │ (cron runs every 5 mins during NSE market hours)
 [GitHub Actions (.github/workflows/update.yml)]
        │
        ▼ (session cookie handshake + /api/allIndices)
@@ -41,11 +41,11 @@ The dashboard tracks all 5 benchmark and broad market indices:
 
 ## ⏱️ Features
 
-- **Automated Market-Hours Cron:** GitHub Actions automatically runs every 15 minutes during NSE trading sessions (**Mon–Fri 09:15 to 15:45 IST** / `03:45 to 10:15 UTC`).
+- **Automated Market-Hours Cron:** GitHub Actions automatically runs every 5 minutes during NSE trading sessions (**Mon–Fri 09:15 to 15:45 IST** / `03:45 to 10:15 UTC`).
 - **Tab Visibility Aware:** Utilizes HTML5 `Page Visibility API`. Refresh timers pause when the tab is inactive or minimized, and refresh immediately when you switch back.
 - **Market Status Indicator:** Automatically detects market hours (09:15–15:30 IST) and pauses polling when the market is closed or on weekends.
 - **Theme Support:** One-click toggle between **Dark Mode** and **Light Mode** with persistence in `localStorage`.
-- **Configurable Refresh Rate:** Choose auto-refresh intervals (1m, 2m, 5m, 15m, or Manual) in Dashboard Preferences (`⚙️`).
+- **Configurable Refresh Rate:** Choose auto-refresh intervals (1m, 2m, 5m, or Manual) in Dashboard Preferences (`⚙️`).
 - **Tick Flashes:** Price cards flash green (gains) or red (declines) when new prices load.
 
 ---
@@ -60,7 +60,7 @@ nifty-live-indices/
 ├── package.json                # Project metadata and fetch script
 └── .github/
     └── workflows/
-        └── update.yml          # GitHub Actions cron updating data.json every 15 mins
+        └── update.yml          # GitHub Actions cron updating data.json every 5 mins
 ```
 
 ---

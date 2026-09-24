@@ -727,7 +727,7 @@
         <div class="brand-logo">N</div>
         <div class="brand-info">
           <h1>NIFTY Live Indices <span class="tag">NSE India</span></h1>
-          <p>NSE Tick: <span id="last-updated-val" style="font-family: var(--font-mono); color: var(--text-primary); font-weight: 600;">--</span> • Auto-refreshes every 1 min</p>
+          <p>NSE Tick: <span id="last-updated-val" style="font-family: var(--font-mono); color: var(--text-primary); font-weight: 600;">--</span> • Auto-refreshes every 5 mins</p>
         </div>
       </div>
 
@@ -808,14 +808,13 @@
       <div class="form-group">
         <label for="refresh-interval-select">Auto-Refresh Interval</label>
         <select id="refresh-interval-select" class="form-control">
-          <option value="60" selected>Every 1 minute (Default)</option>
+          <option value="60">Every 1 minute</option>
           <option value="120">Every 2 minutes</option>
-          <option value="300">Every 5 minutes</option>
-          <option value="900">Every 15 minutes (Matches GitHub Actions cron)</option>
+          <option value="300" selected>Every 5 minutes (Matches GitHub Actions)</option>
           <option value="0">Manual Only (Disable auto-refresh)</option>
         </select>
         <p class="helper-text">
-          The dashboard automatically re-checks for fresh data while the market is open (09:15–15:30 IST) and pauses when closed or when this tab is hidden. Market data is refreshed automatically every 15 minutes by GitHub Actions.
+          The dashboard automatically re-checks for fresh data while the market is open (09:15–15:30 IST) and pauses when closed or when this tab is hidden. Market data is updated automatically every 5 minutes by GitHub Actions.
         </p>
       </div>
 
@@ -838,7 +837,7 @@
 
   <script>
     const CONFIG = {
-      defaultInterval: 60, // 1 minute
+      defaultInterval: 300, // 5 minutes
       feedUrl: 'data.json',
       targetIndices: [
         { key: 'NIFTY 50', category: 'Large Cap (50)', label: 'NIFTY 50' },
@@ -850,8 +849,8 @@
     };
 
     let state = {
-      refreshInterval: parseInt(localStorage.getItem('nifty_refresh_sec') || '60', 10),
-      countdown: 60,
+      refreshInterval: parseInt(localStorage.getItem('nifty_refresh_sec') || '300', 10),
+      countdown: 300,
       timerId: null,
       isFetching: false,
       lastFetchTime: 0,
@@ -1112,6 +1111,15 @@
       elements.indicesContainer.innerHTML = cardsHtml;
     }
 
+    function formatCountdown(sec) {
+      if (sec >= 60) {
+        const m = Math.floor(sec / 60);
+        const s = sec % 60;
+        return `${m}m ${s < 10 ? '0' : ''}${s}s`;
+      }
+      return `${sec}s`;
+    }
+
     // Auto-Refresh Countdown Manager (updates every 1s)
     function startCountdown() {
       if (state.timerId) clearInterval(state.timerId);
@@ -1135,7 +1143,7 @@
         if (!state.isPageVisible) return;
 
         state.countdown--;
-        elements.countdownText.textContent = `${state.countdown}s`;
+        elements.countdownText.textContent = formatCountdown(state.countdown);
 
         if (state.countdown <= 0) {
           fetchIndices();
@@ -1148,7 +1156,7 @@
       if (!state.isMarketOpen) {
         elements.countdownText.textContent = 'Market Closed';
       } else {
-        elements.countdownText.textContent = `${state.countdown}s`;
+        elements.countdownText.textContent = formatCountdown(state.countdown);
       }
     }
 

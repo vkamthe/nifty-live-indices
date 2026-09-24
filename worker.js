@@ -30,6 +30,10 @@ export default {
 
     const url = new URL(request.url);
 
+    if (url.pathname === '/favicon.ico') {
+      return new Response(null, { status: 204 });
+    }
+
     if (url.pathname === '/api/health') {
       return new Response(JSON.stringify({ status: 'ok', workerTime: new Date().toISOString() }), {
         headers: CORS_HEADERS

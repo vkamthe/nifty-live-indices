@@ -1020,6 +1020,9 @@
           } else if (state.proxyUrl.includes('localhost')) {
             elements.proxySourceText.textContent = `Local Proxy (${latency}ms)`;
             elements.connectionDot.className = 'dot live';
+          } else if (state.proxyUrl.includes('workers.dev')) {
+            elements.proxySourceText.textContent = `Cloudflare Edge (${latency}ms)`;
+            elements.connectionDot.className = 'dot live';
           } else {
             elements.proxySourceText.textContent = `Live Proxy (${latency}ms)`;
             elements.connectionDot.className = 'dot live';

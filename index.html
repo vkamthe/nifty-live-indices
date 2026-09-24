@@ -851,6 +851,7 @@
         <input type="text" id="proxy-input" class="form-control" placeholder="data.json or http://localhost:3000/api/indices">
         <div class="preset-btns">
           <button type="button" class="preset-btn" data-preset="snapshot">GitHub Snapshot (data.json)</button>
+          <button type="button" class="preset-btn" data-preset="cloudflare">Cloudflare Worker (Custom)</button>
           <button type="button" class="preset-btn" data-preset="local">Local Proxy (localhost:3000)</button>
         </div>
         <p class="helper-text">
@@ -1304,6 +1305,12 @@
           if (elements.proxyInput) elements.proxyInput.value = 'http://localhost:3000/api/indices';
         } else if (preset === 'snapshot') {
           if (elements.proxyInput) elements.proxyInput.value = 'data.json';
+        } else if (preset === 'cloudflare') {
+          if (elements.proxyInput) {
+            elements.proxyInput.value = 'https://nifty-indices-proxy.YOUR_SUBDOMAIN.workers.dev';
+            elements.proxyInput.focus();
+            elements.proxyInput.setSelectionRange(28, 42);
+          }
         }
       });
     });

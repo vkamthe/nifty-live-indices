@@ -2,10 +2,8 @@ name: Update NSE Indices Data
 
 on:
   schedule:
-    # Runs during NSE trading days Mon-Fri every 5 minutes between 03:45 UTC (09:15 IST) and 10:15 UTC (15:45 IST)
-    - cron: "45,50,55 3 * * 1-5"
-    - cron: "*/5 4-9 * * 1-5"
-    - cron: "0,5,10,15 10 * * 1-5"
+    # Runs every 5 minutes during weekdays Mon-Fri (Standard POSIX cron)
+    - cron: "*/5 * * * 1-5"
   workflow_dispatch: {}
 
 permissions:
@@ -19,18 +17,47 @@ jobs:
   update:
     runs-on: ubuntu-latest
     steps:
+      - name: Check NSE Market Hours
+        id: check_market
+        run: |
+          # Always proceed on manual workflow_dispatch triggers
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "is_open=true" >> "$GITHUB_OUTPUT"
+            echo "Manual trigger detected. Proceeding with update."
+            exit 0
+          fi
+
+          # NSE Market Trading Session in UTC:
+          # Mon-Fri 03:45 UTC (09:15 IST) to 10:15 UTC (15:45 IST)
+          HOUR=$(date -u +%H)
+          MIN=$(date -u +%M)
+          TOTAL_MIN=$(( 10#$HOUR * 60 + 10#$MIN ))
+
+          # 03:45 UTC = 225 mins | 10:15 UTC = 615 mins
+          if [ "$TOTAL_MIN" -ge 225 ] && [ "$TOTAL_MIN" -le 615 ]; then
+            echo "Inside NSE trading session (${HOUR}:${MIN} UTC). Proceeding with update."
+            echo "is_open=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "Outside NSE trading session (${HOUR}:${MIN} UTC). Skipping update."
+            echo "is_open=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Checkout repository
+        if: steps.check_market.outputs.is_open == 'true'
         uses: actions/checkout@v4
 
       - name: Setup Node.js
+        if: steps.check_market.outputs.is_open == 'true'
         uses: actions/setup-node@v4
         with:
           node-version: "22"
 
       - name: Fetch latest NSE Indices
+        if: steps.check_market.outputs.is_open == 'true'
         run: node fetch.js
 
       - name: Commit and push changes
+        if: steps.check_market.outputs.is_open == 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"

@@ -25,7 +25,7 @@ The dashboard tracks all 5 benchmark and broad market indices:
        ▼ (polls data.json with cache-busting)
 [data.json (Repository Snapshot)]
        ▲
-       │ (cron runs every 5 mins during NSE market hours)
+       │ (active sync loop updates every 5 mins during NSE market hours)
 [GitHub Actions (.github/workflows/update.yml)]
        │
        ▼ (session cookie handshake + /api/allIndices)
@@ -35,13 +35,14 @@ The dashboard tracks all 5 benchmark and broad market indices:
 ### Why This Architecture?
 - **Zero Third-Party Accounts:** Runs entirely within GitHub—no Cloudflare, Vercel, or external servers needed.
 - **Bypasses Browser CORS:** GitHub Actions runs in an isolated runner environment, safely handling the NSE session handshake and writing clean JSON to `data.json`.
+- **Active Market Session Loop:** Rather than relying solely on GitHub's queued cron scheduler, GitHub Actions runs an active sync loop during market hours that guarantees updates every 5 minutes on the dot.
 - **Cache-Busted Client:** The web dashboard fetches `data.json?t=<timestamp>` with `cache: 'no-store'`, guaranteeing you never receive stale browser-cached data.
 
 ---
 
 ## ⏱️ Features
 
-- **Automated Market-Hours Cron:** GitHub Actions automatically runs every 5 minutes during NSE trading sessions (**Mon–Fri 09:15 to 15:45 IST** / `03:45 to 10:15 UTC`).
+- **Automated Market-Hours Sync:** Active sync loop running every 5 minutes during NSE trading sessions (**Mon–Fri 09:15 to 15:45 IST** / `03:45 to 10:15 UTC`).
 - **Tab Visibility Aware:** Utilizes HTML5 `Page Visibility API`. Refresh timers pause when the tab is inactive or minimized, and refresh immediately when you switch back.
 - **Market Status Indicator:** Automatically detects market hours (09:15–15:30 IST) and pauses polling when the market is closed or on weekends.
 - **Silent Background Sync:** Automatically and silently checks for fresh snapshots every 3 minutes while the market is open, without intrusive countdowns.

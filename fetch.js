@@ -77,6 +77,22 @@ async function main() {
     }
   }
 
+  const dataPath = path.join(__dirname, 'data.json');
+  try {
+    if (fs.existsSync(dataPath)) {
+      const existing = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
+      if (
+        existing.timestamp === raw.timestamp &&
+        JSON.stringify(existing.data) === JSON.stringify(filtered)
+      ) {
+        console.log(`\nSnapshot is identical to current data.json (${raw.timestamp}). Skipping write.`);
+        return;
+      }
+    }
+  } catch (e) {
+    // Proceed with write if read or parse fails
+  }
+
   const payload = {
     source: 'NSE India (Official Public API via Proxy)',
     timestamp: raw.timestamp,
@@ -85,7 +101,6 @@ async function main() {
     data: filtered
   };
 
-  const dataPath = path.join(__dirname, 'data.json');
   fs.writeFileSync(dataPath, JSON.stringify(payload, null, 2));
   console.log(`\nUpdated ${dataPath} at ${payload.timestamp}`);
 }

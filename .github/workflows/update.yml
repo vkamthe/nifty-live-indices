@@ -2,65 +2,85 @@ name: Update NSE Indices Data
 
 on:
   schedule:
-    # Runs every 5 minutes during weekdays Mon-Fri (Standard POSIX cron)
-    - cron: "*/5 * * * 1-5"
-  workflow_dispatch: {}
+    # 03:45 UTC (09:15 IST) - Market Opening Bell (Morning Trading Session Loop)
+    - cron: "45 3 * * 1-5"
+    # 07:00 UTC (12:30 IST) - Mid-Day Session Refresh (Afternoon Trading Session Loop)
+    - cron: "0 7 * * 1-5"
+    # 10:15 UTC (15:45 IST) - Post-Market Final Settlement Snapshot
+    - cron: "15 10 * * 1-5"
+    # Off-peak half-hourly heartbeats during trading hours in case runner was interrupted
+    - cron: "15,45 4-9 * * 1-5"
+  workflow_dispatch:
+    inputs:
+      single_run:
+        description: 'Run once without staying in the 5-minute loop'
+        type: boolean
+        default: false
 
 permissions:
   contents: write
 
 concurrency:
   group: update-nse-data
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   update:
     runs-on: ubuntu-latest
+    timeout-minutes: 240
     steps:
-      - name: Check NSE Market Hours
-        id: check_market
-        run: |
-          # Always proceed on manual workflow_dispatch triggers
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            echo "is_open=true" >> "$GITHUB_OUTPUT"
-            echo "Manual trigger detected. Proceeding with update."
-            exit 0
-          fi
-
-          # NSE Market Trading Session in UTC:
-          # Mon-Fri 03:45 UTC (09:15 IST) to 10:15 UTC (15:45 IST)
-          HOUR=$(date -u +%H)
-          MIN=$(date -u +%M)
-          TOTAL_MIN=$(( 10#$HOUR * 60 + 10#$MIN ))
-
-          # 03:45 UTC = 225 mins | 10:15 UTC = 615 mins
-          if [ "$TOTAL_MIN" -ge 225 ] && [ "$TOTAL_MIN" -le 615 ]; then
-            echo "Inside NSE trading session (${HOUR}:${MIN} UTC). Proceeding with update."
-            echo "is_open=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "Outside NSE trading session (${HOUR}:${MIN} UTC). Skipping update."
-            echo "is_open=false" >> "$GITHUB_OUTPUT"
-          fi
-
       - name: Checkout repository
-        if: steps.check_market.outputs.is_open == 'true'
         uses: actions/checkout@v4
 
       - name: Setup Node.js
-        if: steps.check_market.outputs.is_open == 'true'
         uses: actions/setup-node@v4
         with:
           node-version: "22"
 
-      - name: Fetch latest NSE Indices
-        if: steps.check_market.outputs.is_open == 'true'
-        run: node fetch.js
-
-      - name: Commit and push changes
-        if: steps.check_market.outputs.is_open == 'true'
+      - name: Run Live Sync Session
         run: |
+          INTERVAL=300 # 5 minutes
+
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data.json
-          git commit -m "chore(data): auto-update NSE indices snapshot [skip ci]" || echo "No changes to commit"
-          git push
+
+          while true; do
+            DOW=$(date -u +%u)
+            HOUR=$(date -u +%H)
+            MIN=$(date -u +%M)
+            TOTAL_MIN=$(( 10#$HOUR * 60 + 10#$MIN ))
+
+            # NSE Market Trading Session in UTC:
+            # Mon-Fri 03:45 UTC (09:15 IST) to 10:15 UTC (15:45 IST)
+            # 03:45 UTC = 225 mins | 10:15 UTC = 615 mins
+            IS_OPEN=false
+            if [ "$DOW" -ge 1 ] && [ "$DOW" -le 5 ] && [ "$TOTAL_MIN" -ge 225 ] && [ "$TOTAL_MIN" -le 615 ]; then
+              IS_OPEN=true
+            fi
+
+            echo "=========================================="
+            echo "[$(date -u '+%Y-%m-%d %H:%M:%S UTC')] Market Open: $IS_OPEN (Day: $DOW, Time: ${HOUR}:${MIN} UTC)"
+            echo "Fetching latest NSE indices..."
+            node fetch.js || echo "Fetch warning: temporary error, will retry on next cycle."
+
+            if ! git diff --quiet data.json; then
+              echo "New snapshot detected. Committing and pushing..."
+              git add data.json
+              git commit -m "chore(data): auto-update NSE indices snapshot [skip ci]" || true
+              git pull --rebase origin main || true
+              git push origin main || echo "Push warning: will retry on next cycle."
+            else
+              echo "Snapshot unchanged. No commit needed."
+            fi
+
+            # Exit conditions:
+            # 1) If single_run is explicitly requested, stop immediately.
+            # 2) If market is currently closed, stop immediately (no idle looping outside market hours).
+            if [ "${{ inputs.single_run }}" = "true" ] || [ "$IS_OPEN" != "true" ]; then
+              echo "Session complete (market closed or single-run execution requested)."
+              break
+            fi
+
+            echo "Market is live. Next update in ${INTERVAL}s (5 mins)..."
+            sleep $INTERVAL
+          done

@@ -172,18 +172,29 @@
       50% { opacity: 0.4; transform: scale(0.85); }
     }
 
-    .timer-pill {
+    .icon-subtle-btn {
       display: inline-flex;
       align-items: center;
-      gap: 0.4rem;
-      background: rgba(59, 130, 246, 0.1);
-      border: 1px solid rgba(59, 130, 246, 0.25);
-      color: #93c5fd;
-      padding: 0.35rem 0.75rem;
-      border-radius: 9999px;
-      font-size: 0.75rem;
-      font-family: var(--font-mono);
-      font-weight: 600;
+      justify-content: center;
+      width: 20px;
+      height: 20px;
+      padding: 0;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      border-radius: 4px;
+      cursor: pointer;
+      margin-left: 0.35rem;
+      transition: all 0.15s ease;
+    }
+
+    .icon-subtle-btn:hover {
+      color: var(--text-primary);
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    body.light-mode .icon-subtle-btn:hover {
+      background: rgba(0, 0, 0, 0.08);
     }
 
     /* Buttons */
@@ -529,156 +540,6 @@
       background: rgba(0, 0, 0, 0.08);
     }
 
-    body.light-mode .timer-pill {
-      background: rgba(59, 130, 246, 0.12);
-      border-color: rgba(59, 130, 246, 0.3);
-      color: #1d4ed8;
-    }
-
-    body.light-mode .category-pill {
-      background: rgba(0, 0, 0, 0.04);
-      border-color: rgba(0, 0, 0, 0.08);
-      color: var(--text-secondary);
-    }
-
-    body.light-mode .modal {
-      background: #ffffff;
-      border-color: rgba(0, 0, 0, 0.12);
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-    }
-
-    body.light-mode .form-control {
-      background: #f8fafc;
-      border-color: rgba(0, 0, 0, 0.15);
-      color: #0f172a;
-    }
-
-    body.light-mode .theme-btn {
-      background: #f8fafc;
-      border-color: rgba(0, 0, 0, 0.1);
-      color: #475569;
-    }
-
-    body.light-mode .theme-btn.active {
-      background: rgba(59, 130, 246, 0.12);
-      border-color: #2563eb;
-      color: #1d4ed8;
-    }
-
-    /* Preferences Modal */
-    .modal-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.65);
-      backdrop-filter: blur(8px);
-      z-index: 100;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 1.5rem;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.2s ease;
-    }
-
-    .modal-overlay.open {
-      opacity: 1;
-      pointer-events: auto;
-    }
-
-    .modal {
-      background: var(--bg-secondary);
-      border: 1px solid var(--border-color);
-      border-radius: 16px;
-      max-width: 480px;
-      width: 100%;
-      padding: 1.75rem;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
-      display: flex;
-      flex-direction: column;
-      gap: 1.25rem;
-    }
-
-    .modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .modal-header h3 {
-      font-size: 1.15rem;
-      font-weight: 700;
-    }
-
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-    }
-
-    .form-group label {
-      font-size: 0.82rem;
-      font-weight: 600;
-      color: var(--text-secondary);
-    }
-
-    .form-control {
-      background: rgba(0, 0, 0, 0.25);
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      padding: 0.65rem 0.85rem;
-      color: var(--text-primary);
-      font-family: var(--font-sans);
-      font-size: 0.85rem;
-      outline: none;
-      transition: border-color 0.15s ease;
-    }
-
-    .form-control:focus {
-      border-color: var(--blue);
-    }
-
-    .helper-text {
-      font-size: 0.72rem;
-      color: var(--text-muted);
-      line-height: 1.4;
-    }
-
-    /* Theme Option Buttons */
-    .theme-options {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0.75rem;
-    }
-
-    .theme-btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.5rem;
-      padding: 0.65rem 1rem;
-      border-radius: 8px;
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid var(--border-color);
-      color: var(--text-secondary);
-      font-size: 0.85rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.15s ease;
-      font-family: var(--font-sans);
-    }
-
-    .theme-btn:hover {
-      background: rgba(255, 255, 255, 0.08);
-      color: var(--text-primary);
-    }
-
-    .theme-btn.active {
-      background: rgba(59, 130, 246, 0.15);
-      border-color: var(--blue);
-      color: #60a5fa;
-    }
-
     /* Footer */
     footer {
       margin-top: auto;
@@ -727,7 +588,7 @@
         <div class="brand-logo">N</div>
         <div class="brand-info">
           <h1>NIFTY Live Indices <span class="tag">NSE India</span></h1>
-          <p>NSE Tick: <span id="last-updated-val" style="font-family: var(--font-mono); color: var(--text-primary); font-weight: 600;">--</span> • Auto-refreshes every 5 mins</p>
+          <p>Market Snapshot Tracker • Automated via GitHub Actions</p>
         </div>
       </div>
 
@@ -738,33 +599,20 @@
           <span id="market-status-text">Checking market...</span>
         </div>
 
-        <!-- Connection Source Badge -->
-        <div class="status-badge" id="proxy-source-badge" title="Data Feed: NSE India (via GitHub Actions)">
-          <span class="dot live" id="connection-dot"></span>
-          <span id="proxy-source-text">NSE India Feed</span>
+        <!-- Snapshot Timestamp & Sync Badge -->
+        <div class="status-badge" id="snapshot-badge" title="Snapshot recorded by NSE India and published via GitHub Actions">
+          <span class="dot live" id="snapshot-dot"></span>
+          <span>Snapshot: <strong id="last-updated-val" style="font-family: var(--font-mono); color: var(--text-primary); font-weight: 600;">--</strong></span>
+          <button class="icon-subtle-btn" id="refresh-btn" title="Check GitHub Pages for newer snapshot" aria-label="Check for new snapshot">
+            <svg id="refresh-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
+            </svg>
+          </button>
         </div>
-
-        <!-- Countdown Pill -->
-        <div class="timer-pill" id="timer-pill" title="Next automatic refresh countdown">
-          ⏱️ <span id="countdown-text">60s</span>
-        </div>
-
-        <!-- Refresh Button -->
-        <button class="btn btn-primary" id="refresh-btn" title="Refresh data immediately">
-          <svg id="refresh-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
-          </svg>
-          <span>Refresh</span>
-        </button>
 
         <!-- Quick Theme Toggle -->
         <button class="btn btn-icon" id="theme-toggle-btn" title="Toggle Light / Dark Mode">
           <span id="theme-toggle-icon">☀️</span>
-        </button>
-
-        <!-- Preferences / Settings Button -->
-        <button class="btn btn-icon" id="settings-btn" title="Dashboard Preferences">
-          ⚙️
         </button>
       </div>
     </div>
@@ -783,47 +631,6 @@
 
   </main>
 
-  <!-- Preferences Modal -->
-  <div class="modal-overlay" id="settings-modal">
-    <div class="modal">
-      <div class="modal-header">
-        <h3>Dashboard Preferences</h3>
-        <button class="btn btn-icon" id="close-modal-btn">✕</button>
-      </div>
-
-      <!-- Theme Setting -->
-      <div class="form-group">
-        <label>Appearance / Theme</label>
-        <div class="theme-options">
-          <button class="theme-btn active" id="theme-btn-dark">
-            <span>🌙</span> Dark Mode
-          </button>
-          <button class="theme-btn" id="theme-btn-light">
-            <span>☀️</span> Light Mode
-          </button>
-        </div>
-      </div>
-
-      <!-- Refresh Rate Setting -->
-      <div class="form-group">
-        <label for="refresh-interval-select">Auto-Refresh Interval</label>
-        <select id="refresh-interval-select" class="form-control">
-          <option value="60">Every 1 minute</option>
-          <option value="120">Every 2 minutes</option>
-          <option value="300" selected>Every 5 minutes (Matches GitHub Actions)</option>
-          <option value="0">Manual Only (Disable auto-refresh)</option>
-        </select>
-        <p class="helper-text">
-          The dashboard automatically re-checks for fresh data while the market is open (09:15–15:30 IST) and pauses when closed or when this tab is hidden. Market data is updated automatically every 5 minutes by GitHub Actions.
-        </p>
-      </div>
-
-      <div style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 0.5rem;">
-        <button class="btn btn-primary" id="save-settings-btn">Done</button>
-      </div>
-    </div>
-  </div>
-
   <!-- Footer -->
   <footer>
     <p>
@@ -837,8 +644,8 @@
 
   <script>
     const CONFIG = {
-      defaultInterval: 300, // 5 minutes
       feedUrl: 'data.json',
+      syncIntervalMs: 180000, // Silently check GitHub Pages for new snapshot every 3 minutes
       targetIndices: [
         { key: 'NIFTY 50', category: 'Large Cap (50)', label: 'NIFTY 50' },
         { key: 'NIFTY MIDCAP 100', category: 'Mid Cap (100)', label: 'NIFTY MIDCAP 100' },
@@ -849,9 +656,6 @@
     };
 
     let state = {
-      refreshInterval: parseInt(localStorage.getItem('nifty_refresh_sec') || '300', 10),
-      countdown: 300,
-      timerId: null,
       isFetching: false,
       lastFetchTime: 0,
       previousData: {},
@@ -865,22 +669,12 @@
       indicesContainer: document.getElementById('indices-container'),
       refreshBtn: document.getElementById('refresh-btn'),
       refreshIcon: document.getElementById('refresh-icon'),
-      countdownText: document.getElementById('countdown-text'),
-      timerPill: document.getElementById('timer-pill'),
       marketDot: document.getElementById('market-dot'),
       marketStatusText: document.getElementById('market-status-text'),
-      proxySourceText: document.getElementById('proxy-source-text'),
-      connectionDot: document.getElementById('connection-dot'),
+      snapshotDot: document.getElementById('snapshot-dot'),
       lastUpdatedVal: document.getElementById('last-updated-val'),
       themeToggleBtn: document.getElementById('theme-toggle-btn'),
-      themeToggleIcon: document.getElementById('theme-toggle-icon'),
-      settingsBtn: document.getElementById('settings-btn'),
-      settingsModal: document.getElementById('settings-modal'),
-      closeModalBtn: document.getElementById('close-modal-btn'),
-      saveSettingsBtn: document.getElementById('save-settings-btn'),
-      themeBtnDark: document.getElementById('theme-btn-dark'),
-      themeBtnLight: document.getElementById('theme-btn-light'),
-      refreshIntervalSelect: document.getElementById('refresh-interval-select')
+      themeToggleIcon: document.getElementById('theme-toggle-icon')
     };
 
     // Indian Currency Number Formatter
@@ -914,18 +708,14 @@
       if (isOpen) {
         elements.marketDot.className = 'dot live';
         elements.marketStatusText.textContent = 'NSE Market Live';
-        elements.timerPill.title = 'Auto-refreshing while market is open';
-        // If market transitioned from closed to open, restart countdown
         if (!wasOpen) {
-          resetCountdown();
+          fetchIndices();
         }
       } else {
         elements.marketDot.className = 'dot paused';
         elements.marketStatusText.textContent = isWeekday && currentMinutes < openMinutes 
           ? 'Pre-Market (Opens 09:15 IST)' 
           : 'NSE Market Closed';
-        elements.countdownText.textContent = 'Market Closed';
-        elements.timerPill.title = 'Auto-refresh paused: NSE Market is closed';
       }
     }
 
@@ -933,9 +723,8 @@
     async function fetchIndices(isManual = false) {
       if (state.isFetching) return;
       state.isFetching = true;
-      elements.refreshIcon.classList.add('spin');
+      if (elements.refreshIcon) elements.refreshIcon.classList.add('spin');
 
-      const startTime = performance.now();
       let payload = null;
 
       try {
@@ -952,19 +741,17 @@
 
         if (res.ok) {
           payload = await res.json();
-          const latency = Math.round(performance.now() - startTime);
-          elements.proxySourceText.textContent = `NSE Feed (${latency}ms)`;
-          elements.connectionDot.className = 'dot live';
+          if (elements.snapshotDot) elements.snapshotDot.className = 'dot live';
         } else {
           throw new Error(`Feed status: ${res.status}`);
         }
       } catch (err) {
-        console.warn('Data fetch failed:', err.message);
-        elements.connectionDot.className = 'dot paused';
+        console.warn('Snapshot fetch failed:', err.message);
+        if (elements.snapshotDot) elements.snapshotDot.className = 'dot paused';
       }
 
       state.isFetching = false;
-      elements.refreshIcon.classList.remove('spin');
+      if (elements.refreshIcon) elements.refreshIcon.classList.remove('spin');
       state.lastFetchTime = Date.now();
 
       if (payload && payload.data) {
@@ -973,17 +760,14 @@
         // If initial load failed completely and no cards rendered
         elements.indicesContainer.innerHTML = `
           <div style="grid-column: 1 / -1; text-align: center; padding: 3rem; background: var(--bg-card); border-radius: 12px; border: 1px solid var(--border-color);">
-            <h3 style="color: var(--amber); margin-bottom: 0.5rem;">Could not load market data</h3>
+            <h3 style="color: var(--amber); margin-bottom: 0.5rem;">Could not load market snapshot</h3>
             <p style="color: var(--text-muted); font-size: 0.9rem; max-width: 500px; margin: 0 auto 1.5rem;">
-              Could not retrieve the index feed. Please check your network connection and try again.
+              Could not retrieve the market snapshot file. Please check your network connection and try again.
             </p>
             <button class="btn btn-primary" onclick="fetchIndices(true)">Retry Now</button>
           </div>
         `;
       }
-
-      // Reset countdown
-      resetCountdown();
     }
 
     // Render cards and update metrics
@@ -1111,70 +895,16 @@
       elements.indicesContainer.innerHTML = cardsHtml;
     }
 
-    function formatCountdown(sec) {
-      if (sec >= 60) {
-        const m = Math.floor(sec / 60);
-        const s = sec % 60;
-        return `${m}m ${s < 10 ? '0' : ''}${s}s`;
-      }
-      return `${sec}s`;
-    }
-
-    // Auto-Refresh Countdown Manager (updates every 1s)
-    function startCountdown() {
-      if (state.timerId) clearInterval(state.timerId);
-
-      state.countdown = state.refreshInterval;
-
-      state.timerId = setInterval(() => {
-        // If market is closed, do not auto-refresh
-        if (!state.isMarketOpen) {
-          elements.countdownText.textContent = 'Market Closed';
-          return;
-        }
-
-        // If auto-refresh is disabled in settings
-        if (state.refreshInterval <= 0) {
-          elements.countdownText.textContent = 'Manual';
-          return;
-        }
-
-        // If tab is currently hidden/inactive, freeze timer
-        if (!state.isPageVisible) return;
-
-        state.countdown--;
-        elements.countdownText.textContent = formatCountdown(state.countdown);
-
-        if (state.countdown <= 0) {
-          fetchIndices();
-        }
-      }, 1000);
-    }
-
-    function resetCountdown() {
-      state.countdown = state.refreshInterval;
-      if (!state.isMarketOpen) {
-        elements.countdownText.textContent = 'Market Closed';
-      } else {
-        elements.countdownText.textContent = formatCountdown(state.countdown);
-      }
-    }
-
-    // Page Visibility API: Pause when tab is hidden, refresh immediately when tab is opened
+    // Page Visibility API: Refresh immediately when user returns to tab
     document.addEventListener('visibilitychange', () => {
       state.isPageVisible = (document.visibilityState === 'visible');
 
-      if (state.isPageVisible) {
-        elements.timerPill.style.opacity = '1';
-        // Only trigger fresh fetch on tab return if market is open
-        if (state.isMarketOpen) {
-          const elapsed = (Date.now() - state.lastFetchTime) / 1000;
-          if (elapsed >= state.refreshInterval) {
-            fetchIndices();
-          }
+      if (state.isPageVisible && state.isMarketOpen) {
+        const elapsed = (Date.now() - state.lastFetchTime) / 1000;
+        // If tab was inactive for more than 60s, silently check for updated snapshot
+        if (elapsed >= 60) {
+          fetchIndices();
         }
-      } else {
-        elements.timerPill.style.opacity = '0.5';
       }
     });
 
@@ -1186,14 +916,10 @@
         document.body.classList.add('light-mode');
         if (elements.themeToggleIcon) elements.themeToggleIcon.textContent = '🌙';
         if (elements.themeToggleBtn) elements.themeToggleBtn.title = 'Switch to Dark Mode';
-        if (elements.themeBtnLight) elements.themeBtnLight.classList.add('active');
-        if (elements.themeBtnDark) elements.themeBtnDark.classList.remove('active');
       } else {
         document.body.classList.remove('light-mode');
         if (elements.themeToggleIcon) elements.themeToggleIcon.textContent = '☀️';
         if (elements.themeToggleBtn) elements.themeToggleBtn.title = 'Switch to Light Mode';
-        if (elements.themeBtnDark) elements.themeBtnDark.classList.add('active');
-        if (elements.themeBtnLight) elements.themeBtnLight.classList.remove('active');
       }
     }
 
@@ -1201,53 +927,31 @@
       setTheme(state.theme === 'dark' ? 'light' : 'dark');
     }
 
-    // Preferences Modal Open/Close
-    function openSettings() {
-      elements.refreshIntervalSelect.value = state.refreshInterval;
-      if (state.theme === 'light') {
-        elements.themeBtnLight.classList.add('active');
-        elements.themeBtnDark.classList.remove('active');
-      } else {
-        elements.themeBtnDark.classList.add('active');
-        elements.themeBtnLight.classList.remove('active');
-      }
-      elements.settingsModal.classList.add('open');
-    }
-
-    function closeSettings() {
-      elements.settingsModal.classList.remove('open');
-    }
-
     // Event Listeners
-    elements.refreshBtn.addEventListener('click', () => {
-      fetchIndices(true);
-    });
+    if (elements.refreshBtn) {
+      elements.refreshBtn.addEventListener('click', () => {
+        fetchIndices(true);
+      });
+    }
 
-    elements.themeToggleBtn.addEventListener('click', toggleTheme);
-    elements.settingsBtn.addEventListener('click', openSettings);
-    elements.closeModalBtn.addEventListener('click', closeSettings);
-    elements.settingsModal.addEventListener('click', (e) => {
-      if (e.target === elements.settingsModal) closeSettings();
-    });
-
-    elements.themeBtnDark.addEventListener('click', () => setTheme('dark'));
-    elements.themeBtnLight.addEventListener('click', () => setTheme('light'));
-
-    elements.saveSettingsBtn.addEventListener('click', () => {
-      const newInterval = parseInt(elements.refreshIntervalSelect.value, 10);
-      state.refreshInterval = newInterval;
-      localStorage.setItem('nifty_refresh_sec', newInterval.toString());
-      resetCountdown();
-      closeSettings();
-    });
+    if (elements.themeToggleBtn) {
+      elements.themeToggleBtn.addEventListener('click', toggleTheme);
+    }
 
     // Initialization
     function init() {
       setTheme(state.theme);
       checkMarketStatus();
-      setInterval(checkMarketStatus, 30000); // Check market open/close every 30s
-      startCountdown();
-      fetchIndices(); // Initial data fetch
+      setInterval(checkMarketStatus, 30000); // Check market open/close status every 30s
+
+      // Silent background check for new GitHub Actions snapshots every 3 minutes
+      setInterval(() => {
+        if (state.isMarketOpen && state.isPageVisible) {
+          fetchIndices();
+        }
+      }, CONFIG.syncIntervalMs);
+
+      fetchIndices(); // Initial snapshot fetch
     }
 
     window.addEventListener('DOMContentLoaded', init);

@@ -44,8 +44,7 @@ The dashboard tracks all 5 benchmark and broad market indices:
 - **Automated Market-Hours Cron:** GitHub Actions automatically runs every 5 minutes during NSE trading sessions (**Mon–Fri 09:15 to 15:45 IST** / `03:45 to 10:15 UTC`).
 - **Tab Visibility Aware:** Utilizes HTML5 `Page Visibility API`. Refresh timers pause when the tab is inactive or minimized, and refresh immediately when you switch back.
 - **Market Status Indicator:** Automatically detects market hours (09:15–15:30 IST) and pauses polling when the market is closed or on weekends.
-- **Theme Support:** One-click toggle between **Dark Mode** and **Light Mode** with persistence in `localStorage`.
-- **Configurable Refresh Rate:** Choose auto-refresh intervals (1m, 2m, 5m, or Manual) in Dashboard Preferences (`⚙️`).
+- **Silent Background Sync:** Automatically and silently checks for fresh snapshots every 3 minutes while the market is open, without intrusive countdowns.
 - **Tick Flashes:** Price cards flash green (gains) or red (declines) when new prices load.
 
 ---

@@ -1,7 +1,7 @@
 {
   "source": "NSE India (Official Public API via Proxy)",
   "timestamp": "01-Oct-2026 15:30",
-  "fetchedAt": "2026-10-01T14:10:24.658Z",
+  "fetchedAt": "2026-10-02T10:03:36.414Z",
   "count": 5,
   "data": [
     {
@@ -22,7 +22,7 @@
       "advances": "13",
       "declines": "37",
       "unchanged": "0",
-      "perChange30d": -6.79,
+      "perChange30d": -6.24,
       "perChange365d": -9.72,
       "chartTodayPath": "https://nsearchives.nseindia.com/today/NIFTY-50.svg"
     },
@@ -44,7 +44,7 @@
       "advances": "110",
       "declines": "390",
       "unchanged": "1",
-      "perChange30d": -6.35,
+      "perChange30d": -5.88,
       "perChange365d": -4.67,
       "chartTodayPath": "https://nsearchives.nseindia.com/today/NIFTY-500.svg"
     },
@@ -66,7 +66,7 @@
       "advances": "26",
       "declines": "74",
       "unchanged": "0",
-      "perChange30d": -7.27,
+      "perChange30d": -6.78,
       "perChange365d": 2.98,
       "chartTodayPath": "https://nsearchives.nseindia.com/today/NIFTY-MIDCAP-100.svg"
     },
@@ -88,7 +88,7 @@
       "advances": "47",
       "declines": "203",
       "unchanged": "1",
-      "perChange30d": -4.22,
+      "perChange30d": -3.65,
       "perChange365d": 4.27,
       "chartTodayPath": "https://nsearchives.nseindia.com/today/NIFTY-SMLCAP-250.svg"
     },
@@ -110,7 +110,7 @@
       "advances": "46",
       "declines": "203",
       "unchanged": "5",
-      "perChange30d": -1.42,
+      "perChange30d": -0.84,
       "perChange365d": 11.66,
       "chartTodayPath": "https://nsearchives.nseindia.com/today/NIFTY-MICROCAP250.svg"
     }

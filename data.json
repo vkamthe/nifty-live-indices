@@ -1,7 +1,7 @@
 {
   "source": "NSE India (Official Public API via Proxy)",
   "timestamp": "05-Oct-2026 15:30",
-  "fetchedAt": "2026-10-05T10:52:02.747Z",
+  "fetchedAt": "2026-10-05T11:24:39.166Z",
   "count": 5,
   "data": [
     {
@@ -42,8 +42,8 @@
       "pb": "3.06",
       "dy": "1.03",
       "advances": "274",
-      "declines": "225",
-      "unchanged": "2",
+      "declines": "224",
+      "unchanged": "3",
       "perChange30d": -5.52,
       "perChange365d": -4.59,
       "chartTodayPath": "https://nsearchives.nseindia.com/today/NIFTY-500.svg"
@@ -64,8 +64,8 @@
       "pb": "3.73",
       "dy": "0.65",
       "advances": "64",
-      "declines": "36",
-      "unchanged": "0",
+      "declines": "35",
+      "unchanged": "1",
       "perChange30d": -6.27,
       "perChange365d": 2.82,
       "chartTodayPath": "https://nsearchives.nseindia.com/today/NIFTY-MIDCAP-100.svg"

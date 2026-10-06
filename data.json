@@ -1,7 +1,7 @@
 {
   "source": "NSE India (Official Public API via Proxy)",
   "timestamp": "06-Oct-2026 15:30",
-  "fetchedAt": "2026-10-06T10:47:33.939Z",
+  "fetchedAt": "2026-10-06T11:14:03.351Z",
   "count": 5,
   "data": [
     {
@@ -107,9 +107,9 @@
       "pe": "26.93",
       "pb": "3.12",
       "dy": "0.46",
-      "advances": "196",
+      "advances": "195",
       "declines": "54",
-      "unchanged": "4",
+      "unchanged": "5",
       "perChange30d": -0.8,
       "perChange365d": 12,
       "chartTodayPath": "https://nsearchives.nseindia.com/today/NIFTY-MICROCAP250.svg"

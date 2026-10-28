@@ -1,7 +1,7 @@
 {
   "source": "NSE India (Official Public API via Proxy)",
-  "timestamp": "28-Oct-2026 15:29",
-  "fetchedAt": "2026-10-28T10:01:38.749Z",
+  "timestamp": "28-Oct-2026 15:30",
+  "fetchedAt": "2026-10-28T10:06:41.335Z",
   "count": 5,
   "data": [
     {
@@ -29,9 +29,9 @@
     {
       "name": "NIFTY 500",
       "displayName": "NIFTY 500",
-      "last": 21727.05,
-      "variation": -7.85,
-      "percentChange": -0.04,
+      "last": 21727.45,
+      "variation": -7.45,
+      "percentChange": -0.03,
       "open": 21671.5,
       "high": 21803.75,
       "low": 21554.2,
@@ -51,8 +51,8 @@
     {
       "name": "NIFTY MIDCAP 100",
       "displayName": "NIFTY MIDCAP 100",
-      "last": 57273.35,
-      "variation": 243.45,
+      "last": 57274.7,
+      "variation": 244.8,
       "percentChange": 0.43,
       "open": 56828.6,
       "high": 57492.8,
@@ -73,9 +73,9 @@
     {
       "name": "NIFTY SMALLCAP 250",
       "displayName": "NIFTY SMLCAP 250",
-      "last": 16987.4,
-      "variation": 53.7,
-      "percentChange": 0.32,
+      "last": 16989.4,
+      "variation": 55.7,
+      "percentChange": 0.33,
       "open": 16923.4,
       "high": 17045.7,
       "low": 16860.3,
@@ -88,16 +88,16 @@
       "advances": "124",
       "declines": "124",
       "unchanged": "3",
-      "perChange30d": -4.9,
-      "perChange365d": -2.07,
+      "perChange30d": -4.89,
+      "perChange365d": -2.06,
       "chartTodayPath": "https://nsearchives.nseindia.com/today/NIFTY-SMLCAP-250.svg"
     },
     {
       "name": "NIFTY MICROCAP 250",
       "displayName": "NIFTY MICROCAP250",
-      "last": 24341.35,
-      "variation": 9.25,
-      "percentChange": 0.04,
+      "last": 24352.3,
+      "variation": 20.2,
+      "percentChange": 0.08,
       "open": 24331.7,
       "high": 24467.05,
       "low": 24164.85,
@@ -110,8 +110,8 @@
       "advances": "120",
       "declines": "131",
       "unchanged": "3",
-      "perChange30d": -6.57,
-      "perChange365d": 2.24,
+      "perChange30d": -6.53,
+      "perChange365d": 2.29,
       "chartTodayPath": "https://nsearchives.nseindia.com/today/NIFTY-MICROCAP250.svg"
     }
   ]
